@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:test_app/screens/chatbot.dart';
 import 'package:test_app/screens/history.dart';
 import 'package:test_app/screens/login.dart';
+import 'package:test_app/screens/profile.dart';
 import 'package:test_app/screens/signup.dart';
 
 // You can run this code by placing it in your main.dart file
@@ -17,7 +18,7 @@ class AgapAIApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'AgapAI',
-      initialRoute: '/history', // TO-DO: Change the appropriate route for a specific page
+      initialRoute: '/profile', // TO-DO: Change the appropriate route for a specific page
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -27,7 +28,8 @@ class AgapAIApp extends StatelessWidget {
         '/': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/main': (context) => const MainPage(),
-        '/history': (context) => HistoryPage()
+        '/history': (context) => HistoryPage(),
+        '/profile': (context) => ProfilePage()
       },
     );
   }
