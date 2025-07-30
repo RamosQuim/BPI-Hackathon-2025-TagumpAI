@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:test_app/widgets/signup_prompt.dart';
 import '../widgets/social_login_button.dart';
 
 class LoginPage extends StatelessWidget {
@@ -15,7 +16,7 @@ class LoginPage extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF003C43), // Darker Teal
+              Color(0xFF00353E), // Darker Teal
               Color(0xFF135D66), // Lighter Teal
             ],
           ),
@@ -90,6 +91,9 @@ class LoginPage extends StatelessWidget {
                     // Handle Facebook login
                   },
                 ),
+                const SizedBox(height: 16.0),
+                buildSignUpPrompt(context),
+
                 const Spacer(),
 
                 // Legal Text

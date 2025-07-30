@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/login.dart';
+import 'package:test_app/screens/signup.dart';
 
 // You can run this code by placing it in your main.dart file
 // or calling LoginPage() from your main App widget.
@@ -22,6 +23,7 @@ class AgapAIApp extends StatelessWidget {
       ),
       routes: {
         '/': (context) => const LoginPage(),
+        '/signup': (context) => const SignupPage()
       },
     );
   }
