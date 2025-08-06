@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 // --- DATA MODELS ---
 class ChatMessage {
@@ -124,14 +125,10 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.menu_rounded, color: Color(0xFF495057), size: 30),
-          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-        ),
-        title: const Text(
-          'AgapAI',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF212529)),
+        automaticallyImplyLeading: false,
+        title: Image.asset(
+          'images/agapai_logo.png',
+          height: 35, // A more reasonable height for an AppBar
         ),
         actions: [
           IconButton(
@@ -141,7 +138,6 @@ class _MainPageState extends State<MainPage> {
           ),
         ],
       ),
-      drawer: const _AppDrawer(),
       body: Column(
         children: [
           Expanded(
@@ -307,37 +303,6 @@ class _ChatInputField extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// --- DRAWER & CHART ---
-
-class _AppDrawer extends StatelessWidget {
-  const _AppDrawer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const UserAccountsDrawerHeader(
-            accountName: Text("Alex Doe", style: TextStyle(fontWeight: FontWeight.bold)),
-            accountEmail: Text("alex.doe@email.com"),
-            currentAccountPicture: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Text("A", style: TextStyle(fontSize: 40.0, color: Color(0xFF0D47A1))),
-            ),
-            decoration: BoxDecoration(color: Color(0xFF0D47A1)),
-          ),
-          ListTile(leading: const Icon(Icons.insights), title: const Text('Dashboard'), onTap: () {}),
-          ListTile(leading: const Icon(Icons.history), title: const Text('My Scenarios'), onTap: () {}),
-          ListTile(leading: const Icon(Icons.account_balance_wallet), title: const Text('Accounts'), onTap: () {}),
-          const Divider(),
-          ListTile(leading: const Icon(Icons.settings), title: const Text('Settings'), onTap: () {}),
-        ],
       ),
     );
   }
