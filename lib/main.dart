@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/screens/chatbot.dart';
 import 'package:test_app/screens/history.dart';
 import 'package:test_app/screens/initial_chatbot.dart';
 import 'package:test_app/screens/login.dart';
+import 'package:test_app/screens/onboarding.dart';
 import 'package:test_app/screens/profile.dart';
 import 'package:test_app/screens/signup.dart';
 import 'package:test_app/widgets/navigation_bar.dart';
@@ -21,7 +21,7 @@ class AgapAIApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'AgapAI',
-      initialRoute: '/navbar', // TO-DO: Change the appropriate route for a specific page
+      initialRoute: '/', // TO-DO: Change the appropriate route for a specific page
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
@@ -33,9 +33,9 @@ class AgapAIApp extends StatelessWidget {
         navigationBarTheme: NavigationBarThemeData(
           // Make the default indicator transparent so we can use our custom one.
           indicatorColor: Colors.transparent,
-          iconTheme: MaterialStateProperty.resolveWith<IconThemeData>(
-                (Set<MaterialState> states) {
-              if (states.contains(MaterialState.selected)) {
+          iconTheme: WidgetStateProperty.resolveWith<IconThemeData>(
+                (Set<WidgetState> states) {
+              if (states.contains(WidgetState.selected)) {
                 // Style for the selected icon
                 return const IconThemeData(color: Color(0xFFA42A25));
               } else {
@@ -44,9 +44,9 @@ class AgapAIApp extends StatelessWidget {
               }
             },
           ),
-          labelTextStyle: MaterialStateProperty.resolveWith<TextStyle>(
-                (Set<MaterialState> states) {
-              if (states.contains(MaterialState.selected)) {
+          labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>(
+                (Set<WidgetState> states) {
+              if (states.contains(WidgetState.selected)) {
                 // Style for the selected label
                 return const TextStyle(
                   fontWeight: FontWeight.w900, // Make it thicker
@@ -76,7 +76,8 @@ class AgapAIApp extends StatelessWidget {
         ),
       ),
       routes: {
-        '/': (context) => const LoginPage(),
+        '/': (context) => const OnboardingScreen(),
+        '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/main': (context) => InitialMainPage(),
         '/history': (context) => HistoryPage(),

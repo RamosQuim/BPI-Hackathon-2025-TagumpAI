@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class InitialMainPage extends StatefulWidget {
   const InitialMainPage({super.key});
@@ -8,6 +9,20 @@ class InitialMainPage extends StatefulWidget {
 }
 
 class _InitialMainPageState extends State<InitialMainPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
+  }
+
   // State for the currently selected index in the BottomNavigationBar
   int _selectedIndex = 1;
 
