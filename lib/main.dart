@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/chatbot.dart';
 import 'package:test_app/screens/history.dart';
+import 'package:test_app/screens/initial_chatbot.dart';
 import 'package:test_app/screens/login.dart';
 import 'package:test_app/screens/profile.dart';
 import 'package:test_app/screens/signup.dart';
@@ -77,7 +78,7 @@ class AgapAIApp extends StatelessWidget {
       routes: {
         '/': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
-        '/main': (context) => MainPage(),
+        '/main': (context) => InitialMainPage(),
         '/history': (context) => HistoryPage(),
         '/profile': (context) => ProfilePage(),
         '/navbar': (context) => MainNavigation()

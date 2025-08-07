@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/chatbot.dart';
 import 'package:test_app/screens/history.dart';
+import 'package:test_app/screens/initial_chatbot.dart';
 import 'package:test_app/screens/profile.dart';
 
 // This is the main screen widget which contains the swipeable pages and the navigation bar.
@@ -23,7 +24,7 @@ class _MainNavigationState extends State<MainNavigation> {
   // List of the pages that will be displayed.
   List<Widget> pages = <Widget>[
     HistoryPage(),
-    MainPage(), // Renamed from MainPage for clarity
+    InitialMainPage(), // Renamed from MainPage for clarity
     ProfilePage(),
   ];
 
