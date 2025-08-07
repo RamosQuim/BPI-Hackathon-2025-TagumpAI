@@ -99,7 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     // Navigate to your app's main screen
     // For demonstration, we'll just print a message.
     // ignore: avoid_print
-    print('Get Started Tapped! Navigating to home screen...');
+    Navigator.pushNamed(context, '/login');
     // In a real app, you would navigate to your home screen, e.g.:
     // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
   }
