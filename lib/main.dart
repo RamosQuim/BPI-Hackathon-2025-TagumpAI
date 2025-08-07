@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:test_app/screens/chatbot.dart';
 import 'package:test_app/screens/history.dart';
 import 'package:test_app/screens/initial_chatbot.dart';
+import 'package:test_app/screens/landing.dart';
 import 'package:test_app/screens/login.dart';
 import 'package:test_app/screens/onboarding.dart';
 import 'package:test_app/screens/profile.dart';
@@ -68,9 +70,7 @@ class AgapAIApp extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           // ···
-          titleLarge: GoogleFonts.mulish(
-            fontSize: 24,
-          ),
+          titleLarge: GoogleFonts.mulish(fontSize: 24),
           bodyMedium: GoogleFonts.mulish(),
           displaySmall: GoogleFonts.mulish(),
         ),
@@ -82,7 +82,7 @@ class AgapAIApp extends StatelessWidget {
         '/main': (context) => InitialMainPage(),
         '/history': (context) => HistoryPage(),
         '/profile': (context) => ProfilePage(),
-        '/navbar': (context) => MainNavigation()
+        '/navbar': (context) => MainNavigation(),
       },
     );
   }

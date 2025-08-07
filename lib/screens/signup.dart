@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -10,244 +10,213 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
-  final _dobController = TextEditingController();
+  bool _showPassword = false;
+  bool _showConfirmPassword = false;
 
-  // State variables for form fields
-  String? _selectedIncomeSource;
-  final List<String> _financialGoals = [
-    'Buy a Home',
-    'Save for Retirement',
-    'Travel Fund',
-    'Start a Business',
-    'Emergency Fund',
-    'Education'
-  ];
-  final Set<String> _selectedGoals = {};
-  bool _isBpiClient = false;
-
-  @override
-  void dispose() {
-    _dobController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1920),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        _dobController.text = DateFormat('MMMM d, y').format(picked);
-      });
-    }
-  }
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF003C43), // Your app's dark teal
-            Color(0xFF135D66), // Your app's lighter teal
-          ],
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text('Personalize Your Profile'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // Handle skip action -> navigate to home screen
-              },
-              child: const Text(
-                'Skip',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Telling us more helps create a financial story just for you.",
-                  style: TextStyle(color: Colors.white70, fontSize: 16),
-                ),
-                const SizedBox(height: 32.0),
-
-                // --- Name Field ---
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    prefixIcon: Icon(Icons.person_outline),
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-
-                // --- Date of Birth Field ---
-                TextFormField(
-                  controller: _dobController,
-                  readOnly: true,
-                  onTap: () => _selectDate(context),
-                  decoration: const InputDecoration(
-                    labelText: 'Date of Birth',
-                    prefixIcon: Icon(Icons.calendar_today_outlined),
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-
-                // --- Source of Income Field ---
-                DropdownButtonFormField<String>(
-                  value: _selectedIncomeSource,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedIncomeSource = newValue;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'Primary Source of Income',
-                    prefixIcon: Icon(Icons.work_outline),
-                  ),
-                  items: <String>['Employment', 'Business', 'Freelance', 'Investments', 'Other']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 20.0),
-
-                // --- Income and Expenses ---
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Monthly Income',
-                          prefixIcon: Icon(Icons.attach_money_outlined),
-                          prefixText: '₱ ',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16.0),
-                    Expanded(
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Monthly Expenses',
-                          prefixIcon: Icon(Icons.money_off_outlined),
-                          prefixText: '₱ ',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32.0),
-
-                // --- Financial Goals ---
-                const Text(
-                  'What are your financial goals?',
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12.0),
-                Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: _financialGoals.map((goal) {
-                    final bool isSelected = _selectedGoals.contains(goal);
-                    return ChoiceChip(
-                      label: Text(goal),
-                      selected: isSelected,
-                      onSelected: (bool selected) {
-                        setState(() {
-                          if (selected) {
-                            _selectedGoals.add(goal);
-                          } else {
-                            _selectedGoals.remove(goal);
-                          }
-                        });
-                      },
-                      backgroundColor: const Color(0xFF135D66),
-                      selectedColor: const Color(0xFF77B0AA),
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.black : Colors.white70,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 30),
+                  Text(
+                    'Create Account',
+                    style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        fontSize: 28,
                         fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
-                      side: BorderSide.none,
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 32.0),
-
-                // --- BPI User Toggle ---
-                SwitchListTile(
-                  title: const Text(
-                    'Are you a BPI client?',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    'This can help us suggest relevant products.',
-                    style: TextStyle(color: Colors.white.withOpacity(0.6)),
-                  ),
-                  value: _isBpiClient,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _isBpiClient = value;
-                    });
-                  },
-                  activeColor: const Color(0xFF77B0AA),
-                  tileColor: const Color(0xFF135D66).withOpacity(0.5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-                ),
-                const SizedBox(height: 40.0),
-
-                // --- Finish Button ---
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Handle form submission
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE3FEF7),
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
-                  child: const Text(
-                    'Finish Setup',
-                    style: TextStyle(
-                      color: Color(0xFF003C43),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  const SizedBox(height: 40),
+
+                  // First Name
+                  TextFormField(
+                    controller: _firstNameController,
+                    decoration: _inputDecoration('First Name'),
+                    validator: (value) =>
+                        value == null || value.isEmpty ? 'Required' : null,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Last Name
+                  TextFormField(
+                    controller: _lastNameController,
+                    decoration: _inputDecoration('Last Name'),
+                    validator: (value) =>
+                        value == null || value.isEmpty ? 'Required' : null,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Email
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: _inputDecoration('Email'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Required';
+                      } else if (!RegExp(
+                        r'^[^@]+@[^@]+\.[^@]+',
+                      ).hasMatch(value)) {
+                        return 'Enter a valid email';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Password
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: !_showPassword,
+                    decoration: _inputDecoration(
+                      'Password',
+                      suffixIcon: IconButton(
+                        iconSize: 20,
+                        icon: Icon(
+                          _showPassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() => _showPassword = !_showPassword);
+                        },
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Required';
+                      } else if (value.length < 6) {
+                        return 'At least 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Re-enter Password
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    obscureText: !_showConfirmPassword,
+                    decoration: _inputDecoration(
+                      'Re-enter password',
+                      suffixIcon: IconButton(
+                        iconSize: 20,
+                        icon: Icon(
+                          _showConfirmPassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(
+                            () => _showConfirmPassword = !_showConfirmPassword,
+                          );
+                        },
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Required';
+                      } else if (value != _passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Sign Up Button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFA42921),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // TODO: Submit form
+                      }
+                    },
+                    child: const Text(
+                      'Sign up',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 18),
+
+                  // Already have an account?
+                  Center(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context); // Go back to login
+                      },
+                      child: DefaultTextStyle(
+                        style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                            color: Color(0xFF595959),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        child: const Text('Already have an account?'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      )
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint, {Widget? suffixIcon}) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: GoogleFonts.poppins(
+        textStyle: const TextStyle(color: Colors.black45, fontSize: 14),
+      ),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: const Color(0xFFF3F4F6),
+      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      errorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xFFC14040), width: 1.0),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xFFC14040), width: 2.0),
+        borderRadius: BorderRadius.circular(8),
+      ),
     );
   }
 }

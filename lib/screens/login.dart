@@ -1,114 +1,202 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:test_app/widgets/signup_prompt.dart';
-import '../widgets/social_login_button.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _obscurePassword = true;
+
+  final OutlineInputBorder _defaultBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(14),
+    borderSide: BorderSide.none,
+  );
+
+  final OutlineInputBorder _errorBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: const BorderSide(color: Color(0xFFC14040), width: 1.0),
+  );
+
+  final OutlineInputBorder _focusedErrorBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: const BorderSide(color: Color(0xFFC14040), width: 2.0),
+  );
+
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      // Proceed with login
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        // Use a gradient for a visually appealing background
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF00353E), // Darker Teal
-              Color(0xFF135D66), // Lighter Teal
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Low-fidelity Logo
-                const CircleAvatar(
-                  radius: 50.0,
-                  backgroundColor: Color(0xFFE3FEF7),
-                  child: Text(
-                    'A',
-                    style: TextStyle(
-                      fontSize: 60.0,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF003C43),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 50),
+                  Text(
+                    'Hello there!',
+                    style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24.0),
-
-                // App Name
-                const Text(
-                  'AgapAI',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 40.0,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-
-                // Tagline
-                const Text(
-                  'Set your goals, see what your future holds.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFFE3FEF7),
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 72.0),
-
-                // Social Login Buttons (Call-to-Action)
-                SocialLoginButton(
-                  icon: FontAwesomeIcons.google,
-                  label: 'Continue with Google',
-                  onPressed: () {
-                    // Handle Google login
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                SocialLoginButton(
-                  icon: FontAwesomeIcons.apple,
-                  label: 'Continue with Apple',
-                  onPressed: () {
-                    // Handle Apple login
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                SocialLoginButton(
-                  icon: FontAwesomeIcons.facebook,
-                  label: 'Continue with Facebook',
-                  onPressed: () {
-                    // Handle Facebook login
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                buildSignUpPrompt(context),
-
-                const Spacer(),
-
-                // Legal Text
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 24.0),
-                  child: Text(
-                    'By continuing, you agree to our Terms of Service and Privacy Policy.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12.0,
+                  const SizedBox(height: 4),
+                  Text(
+                    'Please sign in to your account',
+                    style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 48),
+
+                  // Email Field
+                  TextFormField(
+                    controller: _emailController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email is required';
+                      }
+                      final emailRegex = RegExp(
+                        r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      );
+                      if (!emailRegex.hasMatch(value)) {
+                        return 'Enter a valid email';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Email address',
+                      hintStyle: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          color: Colors.black45,
+                          fontSize: 14,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: const Color(0xFFF3F4F6),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 20,
+                      ),
+                      border: _defaultBorder,
+                      errorBorder: _errorBorder,
+                      focusedErrorBorder: _focusedErrorBorder,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Password Field
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Password is required';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      hintStyle: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          color: Colors.black45,
+                          fontSize: 14,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: const Color(0xFFF3F4F6),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 20,
+                      ),
+                      border: _defaultBorder,
+                      errorBorder: _errorBorder,
+                      focusedErrorBorder: _focusedErrorBorder,
+                      suffixIcon: IconButton(
+                        iconSize: 20,
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.black45,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Sign In Button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFA42921),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: _submit,
+                    child: const Text(
+                      'Sign In',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  // Create Account
+                  Center(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/signup');
+                      },
+                      child: DefaultTextStyle(
+                        style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                            color: Color(0xFF595959),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        child: const Text('Create new account'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
