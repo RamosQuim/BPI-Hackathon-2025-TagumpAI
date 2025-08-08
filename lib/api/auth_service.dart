@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_model.dart';
 
 class AuthService {
@@ -70,7 +71,72 @@ class AuthService {
     }
   }
 
+  Future<String?> signUpWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return 'Sign up cancelled';
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
+      final user = userCredential.user;
+      if (user == null) return 'User information not available';
+
+      final doc = await _firestore.collection('users').doc(user.uid).get();
+      if (doc.exists) return 'Account already exists. Please sign in instead.';
+
+      await _firestore.collection('users').doc(user.uid).set({
+        'firstName': user.displayName?.split(' ').first ?? '',
+        'lastName': user.displayName?.split(' ').last ?? '',
+        'email': user.email,
+        'createdAt': FieldValue.serverTimestamp(),
+        'authProvider': 'google',
+      });
+
+      return null; // Success
+    } catch (e) {
+      return 'Something went wrong. Please try again.';
+    }
+  }
+
+  Future<String?> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return 'Sign in cancelled';
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await _auth.signInWithCredential(credential);
+      return null; // Success
+    } catch (e) {
+      return 'Failed to sign in. Please try again.';
+    }
+  }
+
   Future<void> logout() async {
+    final currentUser = _auth.currentUser;
+
+    // Sign out from Google if the user signed in with Google
+    for (final info in currentUser?.providerData ?? []) {
+      if (info.providerId == 'google.com') {
+        await GoogleSignIn().signOut();
+        break;
+      }
+    }
+
+    // Sign out from Firebase (works for both email/password and Google)
     await _auth.signOut();
   }
 

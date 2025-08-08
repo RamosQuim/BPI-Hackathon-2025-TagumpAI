@@ -40,6 +40,14 @@ class AuthProvider with ChangeNotifier {
     return result; // null if success, else error string
   }
 
+  Future<String?> signUpWithGoogle() async {
+    return await _authService.signUpWithGoogle();
+  }
+
+  Future<String?> signInWithGoogle() async {
+    return await _authService.signInWithGoogle();
+  }
+
   Future<void> logout() async {
     await _authService.logout();
     _user = null;

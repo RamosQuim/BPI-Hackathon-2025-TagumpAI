@@ -33,8 +33,35 @@ class _LoginPageState extends State<LoginPage> {
   );
 
   bool isLoading = false;
+  bool isGoogleLoading = false;
 
-  void signInWithGoogle() {}
+  void signInWithGoogle() async {
+    setState(() {
+      isGoogleLoading = true;
+    });
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final result = await authProvider.signInWithGoogle();
+
+    if (result != null) {
+      // Show error to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    } else {
+      // Navigate or show success
+      Navigator.pushReplacementNamed(context, '/navbar');
+    }
+
+    setState(() {
+      isGoogleLoading = false;
+    });
+  }
 
   void _submit() async {
     if (_formKey.currentState!.validate()) {
@@ -248,10 +275,8 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 10),
 
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      signInWithGoogle();
-                    },
+                  ElevatedButton(
+                    onPressed: isGoogleLoading ? null : signInWithGoogle,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       elevation: 1,
@@ -261,22 +286,39 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 13),
                     ),
-                    icon: Image.asset(
-                      'assets/icons/google_logo.png',
-                      height: 20,
-                      width: 20,
-                    ),
-                    label: Text(
-                      'Log In with Google',
-                      style: GoogleFonts.poppins(
-                        textStyle: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+                    child: isGoogleLoading
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 4,
+                            ),
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/icons/google_logo.png',
+                                height: 20,
+                                width: 20,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                'Continue with Google',
+                                style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
+
                   const SizedBox(height: 18),
 
                   // Create Account
