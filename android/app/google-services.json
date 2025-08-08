@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1075551521579",
+    "project_id": "agapai-f703f",
+    "storage_bucket": "agapai-f703f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075551521579:android:bbf5bcb5d72913b584d36e",
+        "android_client_info": {
+          "package_name": "com.example.test_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRdvqwWOgxSBG5ZW2-1lMUsd52EBPjgJo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

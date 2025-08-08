@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,9 +32,42 @@ class _LoginPageState extends State<LoginPage> {
     borderSide: const BorderSide(color: Color(0xFFC14040), width: 2.0),
   );
 
-  void _submit() {
+  bool isLoading = false;
+
+  void signInWithGoogle() {}
+
+  void _submit() async {
     if (_formKey.currentState!.validate()) {
-      // Proceed with login
+      setState(() {
+        isLoading = true;
+      });
+
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final result = await authProvider.login(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      if (result != null) {
+        // Show snackbar on error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      } else {
+        // Success: Navigate or show success
+        Navigator.pushReplacementNamed(context, '/navbar');
+      }
+
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -77,13 +112,13 @@ class _LoginPageState extends State<LoginPage> {
                     controller: _emailController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Email is required';
+                        return '* Email is required';
                       }
                       final emailRegex = RegExp(
                         r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
                       );
                       if (!emailRegex.hasMatch(value)) {
-                        return 'Enter a valid email';
+                        return '* Enter a valid email';
                       }
                       return null;
                     },
@@ -98,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                       filled: true,
                       fillColor: const Color(0xFFF3F4F6),
                       contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15,
+                        vertical: 13.5,
                         horizontal: 20,
                       ),
                       border: _defaultBorder,
@@ -114,10 +149,10 @@ class _LoginPageState extends State<LoginPage> {
                     obscureText: _obscurePassword,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password is required';
+                        return '* Password is required';
                       }
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return '* Password must be at least 6 characters';
                       }
                       return null;
                     },
@@ -132,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                       filled: true,
                       fillColor: const Color(0xFFF3F4F6),
                       contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15,
+                        vertical: 13.5,
                         horizontal: 20,
                       ),
                       border: _defaultBorder,
@@ -154,24 +189,91 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 32),
 
                   // Sign In Button
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFA42921),
-                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    onPressed: _submit,
-                    child: const Text(
-                      'Sign In',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                    onPressed: isLoading ? null : _submit,
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 4,
+                            ),
+                          )
+                        : const Text(
+                            'Sign In',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Divider(thickness: 1, color: Color(0xFFDADADA)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Text(
+                          'Or',
+                          style: GoogleFonts.poppins(
+                            textStyle: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Expanded(
+                        child: Divider(thickness: 1, color: Color(0xFFDADADA)),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      signInWithGoogle();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      elevation: 1,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: Color(0xFFECECEC)),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                    ),
+                    icon: Image.asset(
+                      'assets/icons/google_logo.png',
+                      height: 20,
+                      width: 20,
+                    ),
+                    label: Text(
+                      'Log In with Google',
+                      style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),

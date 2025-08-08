@@ -24,8 +24,8 @@ class ChatMessage {
 }
 
 enum MessageSender { user, ai }
-enum MessageType { text, story, graph, recommendation }
 
+enum MessageType { text, story, graph, recommendation }
 
 // --- MAIN PAGE WIDGET ---
 class MainPage extends StatefulWidget {
@@ -42,74 +42,85 @@ class _MainPageState extends State<MainPage> {
   // A longer, story-based conversation with choices and a final recommendation.
   final List<ChatMessage> _messages = [
     ChatMessage(
-        sender: MessageSender.ai,
-        text: "Welcome back, Alex. Let's continue building your financial future. What story shall we write today?",
-        type: MessageType.story,
-        title: "Choose Your Adventure",
-        icon: FontAwesomeIcons.bookOpen,
-        choices: ["Plan for retirement", "Start a business", "Save for a big purchase"]
+      sender: MessageSender.ai,
+      text:
+          "Welcome back, Alex. Let's continue building your financial future. What story shall we write today?",
+      type: MessageType.story,
+      title: "Choose Your Adventure",
+      icon: FontAwesomeIcons.bookOpen,
+      choices: [
+        "Plan for retirement",
+        "Start a business",
+        "Save for a big purchase",
+      ],
     ),
     ChatMessage(
       sender: MessageSender.user,
       text: "Let's explore starting a business.",
     ),
     ChatMessage(
-        sender: MessageSender.ai,
-        text: "An exciting chapter! Starting a business is a journey of bold decisions. To begin, what kind of venture are you dreaming of? Your choice will determine the startup capital we need to plan for.",
-        type: MessageType.story,
-        title: "The Entrepreneur's Dream",
-        icon: FontAwesomeIcons.lightbulb,
-        choices: ["A low-cost online shop", "A physical cafe"]
+      sender: MessageSender.ai,
+      text:
+          "An exciting chapter! Starting a business is a journey of bold decisions. To begin, what kind of venture are you dreaming of? Your choice will determine the startup capital we need to plan for.",
+      type: MessageType.story,
+      title: "The Entrepreneur's Dream",
+      icon: FontAwesomeIcons.lightbulb,
+      choices: ["A low-cost online shop", "A physical cafe"],
     ),
     ChatMessage(
       sender: MessageSender.user,
       text: "I'll choose the physical cafe.",
     ),
     ChatMessage(
-        sender: MessageSender.ai,
-        type: MessageType.graph,
-        title: "Cafe Startup Costs Breakdown",
-        icon: FontAwesomeIcons.chartPie,
-        text: "A bold choice! A cafe requires significant upfront investment. Here is a sample breakdown of initial costs we need to account for. This illustrates why securing the right funding is critical.",
-        graphData: {
-          'Rent Deposit': 6000,
-          'Renovation': 8000,
-          'Equipment': 12000,
-          'Licenses': 2000,
-          'Inventory': 4000,
-        }
+      sender: MessageSender.ai,
+      type: MessageType.graph,
+      title: "Cafe Startup Costs Breakdown",
+      icon: FontAwesomeIcons.chartPie,
+      text:
+          "A bold choice! A cafe requires significant upfront investment. Here is a sample breakdown of initial costs we need to account for. This illustrates why securing the right funding is critical.",
+      graphData: {
+        'Rent Deposit': 6000,
+        'Renovation': 8000,
+        'Equipment': 12000,
+        'Licenses': 2000,
+        'Inventory': 4000,
+      },
     ),
     ChatMessage(
-        sender: MessageSender.ai,
-        text: "To cover these costs, you'll need funding. We can explore two common paths: a traditional bank loan with lower interest but stricter rules, or a flexible online lender with higher interest. Which path feels right for your story?",
-        type: MessageType.story,
-        title: "The Crossroads of Funding",
-        icon: FontAwesomeIcons.codeBranch,
-        choices: ["Traditional bank loan", "Flexible online lender"]
+      sender: MessageSender.ai,
+      text:
+          "To cover these costs, you'll need funding. We can explore two common paths: a traditional bank loan with lower interest but stricter rules, or a flexible online lender with higher interest. Which path feels right for your story?",
+      type: MessageType.story,
+      title: "The Crossroads of Funding",
+      icon: FontAwesomeIcons.codeBranch,
+      choices: ["Traditional bank loan", "Flexible online lender"],
     ),
     ChatMessage(
       sender: MessageSender.user,
       text: "I'll go with the traditional bank loan.",
     ),
     ChatMessage(
-        sender: MessageSender.ai,
-        type: MessageType.recommendation,
-        title: "Your Recommended Action Plan",
-        icon: FontAwesomeIcons.solidFlag,
-        text: "A wise decision. Prioritizing a lower interest rate sets a strong financial foundation for your cafe. To secure a traditional bank loan, here is your recommended course of action:",
-        choices: [
-          "1. Draft a comprehensive business plan.",
-          "2. Compile at least two years of financial statements.",
-          "3. Aim to improve your personal credit score above 720.",
-          "4. Research local banks that specialize in small business loans."
-        ]
-    )
+      sender: MessageSender.ai,
+      type: MessageType.recommendation,
+      title: "Your Recommended Action Plan",
+      icon: FontAwesomeIcons.solidFlag,
+      text:
+          "A wise decision. Prioritizing a lower interest rate sets a strong financial foundation for your cafe. To secure a traditional bank loan, here is your recommended course of action:",
+      choices: [
+        "1. Draft a comprehensive business plan.",
+        "2. Compile at least two years of financial statements.",
+        "3. Aim to improve your personal credit score above 720.",
+        "4. Research local banks that specialize in small business loans.",
+      ],
+    ),
   ];
 
   void _handleSendMessage() {
     if (_textController.text.isNotEmpty) {
       setState(() {
-        _messages.add(ChatMessage(sender: MessageSender.user, text: _textController.text));
+        _messages.add(
+          ChatMessage(sender: MessageSender.user, text: _textController.text),
+        );
       });
       _textController.clear();
       FocusScope.of(context).unfocus();
@@ -126,7 +137,7 @@ class _MainPageState extends State<MainPage> {
         elevation: 1,
         automaticallyImplyLeading: false,
         title: Image.asset(
-          'images/agapai_logo.png',
+          'assets/images/agapai_logo.png',
           height: 35, // A more reasonable height for an AppBar
         ),
         actions: [
@@ -211,7 +222,8 @@ class _VisualCard extends StatelessWidget {
               height: 1.5,
             ),
           ),
-          if (message.type == MessageType.graph && message.graphData != null) ...[
+          if (message.type == MessageType.graph &&
+              message.graphData != null) ...[
             const SizedBox(height: 20),
             SizedBox(
               height: 180,
@@ -223,22 +235,40 @@ class _VisualCard extends StatelessWidget {
             // Use different styling for recommendation checklists vs. story choices
             isRecommendation
                 ? Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: message.choices!.map((choice) => Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text("✅  $choice", style: const TextStyle(fontSize: 15, color: Color(0xFF495057), height: 1.4)),
-                )).toList()
-            )
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: message.choices!
+                        .map(
+                          (choice) => Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              "✅  $choice",
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF495057),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  )
                 : Wrap(
-              spacing: 12.0,
-              children: message.choices!.map((choice) => ActionChip(
-                  label: Text(choice),
-                  onPressed: () {},
-                  backgroundColor: Colors.blue.shade50,
-                  labelStyle: TextStyle(color: Colors.blue.shade800, fontWeight: FontWeight.w600)
-              )).toList(),
-            )
-          ]
+                    spacing: 12.0,
+                    children: message.choices!
+                        .map(
+                          (choice) => ActionChip(
+                            label: Text(choice),
+                            onPressed: () {},
+                            backgroundColor: Colors.blue.shade50,
+                            labelStyle: TextStyle(
+                              color: Colors.blue.shade800,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+          ],
         ],
       ),
     );
@@ -256,7 +286,9 @@ class _UserMessageBubble extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.7,
+        ),
         decoration: BoxDecoration(
           color: const Color(0xFF0D47A1),
           borderRadius: BorderRadius.circular(20),
@@ -341,7 +373,10 @@ class _SavingsBarChart extends StatelessWidget {
               final entry = data.entries.elementAt(groupIndex);
               return BarTooltipItem(
                 '${entry.key}\n',
-                const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
                 children: [
                   TextSpan(
                     text: '\$${rod.toY.round()}',
@@ -354,9 +389,15 @@ class _SavingsBarChart extends StatelessWidget {
         ),
         titlesData: FlTitlesData(
           show: true,
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,

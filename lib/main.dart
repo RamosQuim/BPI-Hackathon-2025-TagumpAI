@@ -10,10 +10,23 @@ import 'package:test_app/screens/signup.dart';
 import 'package:test_app/widgets/navigation_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+
 // You can run this code by placing it in your main.dart file
 // or calling LoginPage() from your main App widget.
-void main() {
-  runApp(const AgapAIApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      child: AgapAIApp(),
+    ),
+  );
 }
 
 class AgapAIApp extends StatelessWidget {
@@ -23,7 +36,8 @@ class AgapAIApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'AgapAI',
-      initialRoute: '/', // TO-DO: Change the appropriate route for a specific page
+      initialRoute:
+          '/', // TO-DO: Change the appropriate route for a specific page
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
@@ -35,41 +49,40 @@ class AgapAIApp extends StatelessWidget {
         navigationBarTheme: NavigationBarThemeData(
           // Make the default indicator transparent so we can use our custom one.
           indicatorColor: Colors.transparent,
-          iconTheme: WidgetStateProperty.resolveWith<IconThemeData>(
-                (Set<WidgetState> states) {
-              if (states.contains(WidgetState.selected)) {
-                // Style for the selected icon
-                return const IconThemeData(color: Color(0xFFA42A25));
-              } else {
-                // Style for the unselected icon
-                return const IconThemeData(color: Colors.grey);
-              }
-            },
-          ),
-          labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>(
-                (Set<WidgetState> states) {
-              if (states.contains(WidgetState.selected)) {
-                // Style for the selected label
-                return const TextStyle(
-                  fontWeight: FontWeight.w900, // Make it thicker
-                  color: Color(0xFFA42A25),   // Set the color
-                );
-              } else {
-                // Style for the unselected label
-                return const TextStyle(
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w800,
-                );
-              }
-            },
-          ),
+          iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((
+            Set<WidgetState> states,
+          ) {
+            if (states.contains(WidgetState.selected)) {
+              // Style for the selected icon
+              return const IconThemeData(color: Color(0xFFA42A25));
+            } else {
+              // Style for the unselected icon
+              return const IconThemeData(color: Colors.grey);
+            }
+          }),
+          labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>((
+            Set<WidgetState> states,
+          ) {
+            if (states.contains(WidgetState.selected)) {
+              // Style for the selected label
+              return const TextStyle(
+                fontWeight: FontWeight.w900, // Make it thicker
+                color: Color(0xFFA42A25), // Set the color
+              );
+            } else {
+              // Style for the unselected label
+              return const TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.w800,
+              );
+            }
+          }),
         ),
         textTheme: TextTheme(
           displayLarge: const TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
           ),
-          // ···
           titleLarge: GoogleFonts.mulish(fontSize: 24),
           bodyMedium: GoogleFonts.mulish(),
           displaySmall: GoogleFonts.mulish(),

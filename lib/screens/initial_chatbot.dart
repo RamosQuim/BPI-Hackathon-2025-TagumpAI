@@ -46,10 +46,7 @@ class _InitialMainPageState extends State<InitialMainPage> {
       // and during over-scrolling.
       backgroundColor: _primaryRed,
       body: CustomScrollView(
-        slivers: [
-          _buildSliverAppBar(),
-          _buildContentSection(),
-        ],
+        slivers: [_buildSliverAppBar(), _buildContentSection()],
       ),
     );
   }
@@ -58,16 +55,17 @@ class _InitialMainPageState extends State<InitialMainPage> {
   SliverAppBar _buildSliverAppBar() {
     return SliverAppBar(
       title: Padding(
-          padding: EdgeInsetsGeometry.fromLTRB(10, 0, 10, 0),
-          child: Image.asset(
-            'images/agapai_logo_white.png',
+        padding: EdgeInsetsGeometry.fromLTRB(10, 0, 10, 0),
+        child: Image.asset(
+          'assets/images/agapai_logo_white.png',
           height: 30, // A more reasonable height for an AppBar
-        )
+        ),
       ),
       expandedHeight: 235.0,
       automaticallyImplyLeading: false,
       elevation: 0,
-      pinned: true, // The app bar will remain visible at the top when collapsed.
+      pinned:
+          true, // The app bar will remain visible at the top when collapsed.
       flexibleSpace: FlexibleSpaceBar(
         // The background of the flexible space bar.
         background: Stack(
@@ -76,7 +74,10 @@ class _InitialMainPageState extends State<InitialMainPage> {
             // Placeholder for the background image pattern in the screenshot.
             // A simple gradient is used here.
             ColorFiltered(
-              colorFilter: const ColorFilter.mode(Color(0xFF510300), BlendMode.overlay),
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF510300),
+                BlendMode.overlay,
+              ),
               child: Image.asset(
                 'images/chatbot_background.png',
                 fit: BoxFit.cover,
@@ -106,9 +107,12 @@ class _InitialMainPageState extends State<InitialMainPage> {
                       color: Colors.white,
                       fontSize: 36,
                       fontVariations: [
-                        FontVariation('wght', 1000.0), // Example: A weight beyond 900
+                        FontVariation(
+                          'wght',
+                          1000.0,
+                        ), // Example: A weight beyond 900
                       ],
-                      height: 1.15
+                      height: 1.15,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -189,11 +193,7 @@ class _InitialMainPageState extends State<InitialMainPage> {
           SizedBox(height: 4),
           Text(
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            style: TextStyle(
-              fontSize: 14,
-              color: _lightTextColor,
-              height: 1.4,
-            ),
+            style: TextStyle(fontSize: 14, color: _lightTextColor, height: 1.4),
           ),
         ],
       ),
@@ -228,11 +228,7 @@ class _InitialMainPageState extends State<InitialMainPage> {
                   color: _primaryRed,
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                child: const Icon(
-                  Icons.send,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                child: const Icon(Icons.send, color: Colors.white, size: 20),
               ),
             ),
             border: OutlineInputBorder(
@@ -247,7 +243,10 @@ class _InitialMainPageState extends State<InitialMainPage> {
               borderRadius: BorderRadius.circular(14.0),
               borderSide: const BorderSide(color: _primaryRed, width: 1.5),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
         ),
       ],

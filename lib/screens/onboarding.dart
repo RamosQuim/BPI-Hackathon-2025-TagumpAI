@@ -1,6 +1,7 @@
 // OnboardingData is a class to hold the data for each onboarding screen.
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 // OnboardingData is a class to hold the data for each onboarding screen.
 class OnboardingData {
   final String image;
@@ -42,32 +43,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // List of data for each onboarding screen, updated to match the new design.
   final List<OnboardingData> _onboardingData = [
     OnboardingData(
-      image: 'images/onboarding_1.png', // Use your PNG asset
+      image: 'assets/images/onboarding_1.png', // Use your PNG asset
       title: 'Welcome to AgapAI',
       subtitle: 'Set your goals, see what your future holds.',
       description:
-      'Your personal guide to making confident financial choices, AgapAI is your safe space to explore the "what-ifs" of your money without the risk.',
+          'Your personal guide to making confident financial choices, AgapAI is your safe space to explore the "what-ifs" of your money without the risk.',
     ),
     OnboardingData(
-      image: 'images/onboarding_2.png', // Use your PNG asset
+      image: 'assets/images/onboarding_2.png', // Use your PNG asset
       title: 'Plan Your Future with Interactive Stories',
       subtitle: '',
       description:
-      'Engage with our KaagapAI that turns complex financial decisions into a simple, story-based format.'
+          'Engage with our KaagapAI that turns complex financial decisions into a simple, story-based format.',
     ),
     OnboardingData(
-      image: 'images/onboarding_3.png', // Use your PNG asset
+      image: 'assets/images/onboarding_3.png', // Use your PNG asset
       title: 'Understand Every Step',
       subtitle: '',
       description:
-      'We provide clear, explainable AI-powered insights in simple language. Our goal is to build your trust and empower you to make informed decisions.'
+          'We provide clear, explainable AI-powered insights in simple language. Our goal is to build your trust and empower you to make informed decisions.',
     ),
     OnboardingData(
-        image: 'images/onboarding_4.png', // Use your PNG asset
-        title: 'Ready to Build Your Future?',
-        subtitle: '',
-        description:
-        'From simulating your first scenario to applying for a product that fits your goals, your journey to financial health starts now.'
+      image: 'assets/images/onboarding_4.png', // Use your PNG asset
+      title: 'Ready to Build Your Future?',
+      subtitle: '',
+      description:
+          'From simulating your first scenario to applying for a product that fits your goals, your journey to financial health starts now.',
     ),
   ];
 
@@ -131,24 +132,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         fit: BoxFit.cover,
                         width: double.infinity,
                         // Optional: Add a frameBuilder for a smooth loading experience
-                        frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-                          if (wasSynchronouslyLoaded) {
-                            return child;
-                          }
-                          return AnimatedOpacity(
-                            opacity: frame == null ? 0 : 1,
-                            duration: const Duration(seconds: 1),
-                            curve: Curves.easeOut,
-                            child: child,
-                          );
-                        },
+                        frameBuilder:
+                            (
+                              BuildContext context,
+                              Widget child,
+                              int? frame,
+                              bool wasSynchronouslyLoaded,
+                            ) {
+                              if (wasSynchronouslyLoaded) {
+                                return child;
+                              }
+                              return AnimatedOpacity(
+                                opacity: frame == null ? 0 : 1,
+                                duration: const Duration(seconds: 1),
+                                curve: Curves.easeOut,
+                                child: child,
+                              );
+                            },
                         // Optional: Add an error builder
                         errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.error_outline, color: Colors.red, size: 50);
+                          return const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 50,
+                          );
                         },
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.45), // Space for the content sheet
+                    SizedBox(
+                      height: screenHeight * 0.45,
+                    ), // Space for the content sheet
                   ],
                 ),
               );
@@ -172,7 +185,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     color: Colors.black.withOpacity(0.15),
                     spreadRadius: 0,
                     blurRadius: 25,
-                    offset: const Offset(0, -5), // Negative y-offset casts shadow upwards
+                    offset: const Offset(
+                      0,
+                      -5,
+                    ), // Negative y-offset casts shadow upwards
                   ),
                 ],
               ),
@@ -185,16 +201,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       _onboardingData.length,
-                          (index) => DotIndicator(isActive: index == _currentPage),
+                      (index) => DotIndicator(isActive: index == _currentPage),
                     ),
                   ),
 
                   // Text Content with Animation
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    transitionBuilder: (Widget child, Animation<double> animation) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          );
+                        },
                     child: OnboardingTextContent(
                       key: ValueKey<int>(_currentPage),
                       data: _onboardingData[_currentPage],
@@ -204,75 +224,86 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Buttons - Conditionally display buttons based on the current page
                   _currentPage == _onboardingData.length - 1
                       ? // On the last page, show a single "Get Started" button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _getStarted,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40),
-                        ),
-                        elevation: 5,
-                      ),
-                      child: const Text(
-                        'Start My Journey',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  )
-                      : // On other pages, show "Skip" and "Next" buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        onPressed: _skipToEnd, // Call the new skip function
-                        child: const Text(
-                          'Skip',
-                          style: TextStyle(fontSize: 16, color: kSubtextColor),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 400),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          elevation: 5,
-                        ),
-                        child: const Row(
-                          children: [
-                            Text(
-                              'Next',
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: _getStarted,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: kPrimaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              elevation: 5,
+                            ),
+                            child: const Text(
+                              'Start My Journey',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+                          ),
+                        )
+                      : // On other pages, show "Skip" and "Next" buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextButton(
+                              onPressed:
+                                  _skipToEnd, // Call the new skip function
+                              child: const Text(
+                                'Skip',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: kSubtextColor,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                _pageController.nextPage(
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeInOut,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                elevation: 5,
+                              ),
+                              child: const Row(
+                                children: [
+                                  Text(
+                                    'Next',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -337,7 +368,9 @@ class DotIndicator extends StatelessWidget {
       height: 8.0,
       width: isActive ? 24.0 : 8.0,
       decoration: BoxDecoration(
-        color: isActive ? _OnboardingScreenState.kTextColor : Colors.grey.withOpacity(0.4),
+        color: isActive
+            ? _OnboardingScreenState.kTextColor
+            : Colors.grey.withOpacity(0.4),
         borderRadius: const BorderRadius.all(Radius.circular(12)),
       ),
     );
