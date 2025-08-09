@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/chatbot.dart';
+import 'package:test_app/screens/chatbot_sample.dart';
 import 'package:test_app/screens/history.dart';
 import 'package:test_app/screens/initial_chatbot.dart';
 import 'package:test_app/screens/landing.dart';
@@ -37,7 +38,7 @@ class AgapAIApp extends StatelessWidget {
     return MaterialApp(
       title: 'AgapAI',
       initialRoute:
-          '/', // TO-DO: Change the appropriate route for a specific page
+          '/chatbot', // TO-DO: Change the appropriate route for a specific page
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
@@ -93,6 +94,7 @@ class AgapAIApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/main': (context) => InitialMainPage(),
+        '/chatbot': (context) => ChatApp(),
         '/history': (context) => HistoryPage(),
         '/profile': (context) => ProfilePage(),
         '/navbar': (context) => MainNavigation(),
