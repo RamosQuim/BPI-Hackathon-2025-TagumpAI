@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../models/user_model.dart'; // Your AppUser model
 
 // --- DATA MODEL for a chat message ---
 class ChatMessage {
@@ -43,18 +46,45 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  // --- STATE ---
   final List<ChatMessage> _messages = [];
   bool _isWaitingForResponse = false;
 
-  // !!! IMPORTANT: Replace with your computer's local IP address !!!
-  final String _baseUrl = "http://192.168.100.33:8000";
+  final String _baseUrl = "http://192.168.100.5:8000";
+
+  AppUser? _currentUser;
 
   @override
   void initState() {
     super.initState();
-    // Add the initial message to start the story
-    _addInitialMessage();
+    _fetchCurrentUser();
+  }
+
+  Future<void> _fetchCurrentUser() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final doc =
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .get();
+        if (doc.exists) {
+          final data = doc.data()!;
+          setState(() {
+            _currentUser = AppUser(
+              uid: user.uid,
+              firstName: data['first_name'] ?? '',
+              lastName: data['last_name'] ?? '',
+              email: data['email'] ?? '',
+            );
+          });
+        }
+      }
+      _addInitialMessage();
+    } catch (e) {
+      print("Error fetching user: $e");
+      _addInitialMessage();
+    }
   }
 
   void _addInitialMessage() {
@@ -62,51 +92,49 @@ class _ChatScreenState extends State<ChatScreen> {
       _messages.add(
         ChatMessage(
           id: '0',
-          narrative: 'Hi! I am AgapAI. Let\'s explore a financial scenario together.',
+          narrative:
+              'Hi ${_currentUser != null ? _currentUser!.firstName : 'there'}! I am AgapAI. Let\'s explore a financial scenario together.',
           choices: ["Let's start!"],
         ),
       );
     });
   }
 
-  // --- API CALL LOGIC ---
   Future<void> _handleUserChoice(String choiceText) async {
     setState(() {
       _isWaitingForResponse = true;
     });
 
     try {
+      final requestBody = {
+        'user_input': choiceText,
+        'chat_history': [],
+        'user_info': _currentUser != null ? _currentUser!.toMap() : null,
+      };
+
       final storyResponse = await http.post(
         Uri.parse('$_baseUrl/generate-story'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'user_input': choiceText, 'chat_history': []}),
+        body: json.encode(requestBody),
       );
 
       if (storyResponse.statusCode == 200) {
         print("Raw server response: ${storyResponse.body}");
 
-        // --- START: ROBUST JSON PARSING ---
-
-        // 1. Decode the outer string to get the inner string content.
         String innerString = json.decode(storyResponse.body);
 
-        // 2. Clean the inner string to remove markdown fences from the AI.
         if (innerString.startsWith("```json")) {
-          innerString = innerString.substring(7); // Remove the starting ```json
+          innerString = innerString.substring(7);
         }
         if (innerString.endsWith("```")) {
           innerString = innerString.substring(0, innerString.length - 3);
         }
-        innerString = innerString.trim(); // Remove any extra whitespace.
+        innerString = innerString.trim();
 
-        // 3. Decode the cleaned inner string to get the final Map object.
         final Map<String, dynamic> storyData = json.decode(innerString);
 
         print("Successfully parsed data: $storyData");
 
-        // --- END: ROBUST JSON PARSING ---
-
-        // Check for a logical error sent by the server.
         if (storyData.containsKey('error')) {
           setState(() {
             _messages.add(
@@ -118,10 +146,9 @@ class _ChatScreenState extends State<ChatScreen> {
             );
             _isWaitingForResponse = false;
           });
-          return; // Stop execution here
+          return;
         }
 
-        // If no error, proceed to create the message.
         final newMessageId = DateTime.now().millisecondsSinceEpoch.toString();
         final newChatMessage = ChatMessage(
           id: newMessageId,
@@ -136,7 +163,6 @@ class _ChatScreenState extends State<ChatScreen> {
         });
 
         _generateAndSetImage(newMessageId, newChatMessage.narrative);
-
       } else {
         print("Server returned an error: ${storyResponse.statusCode}");
         setState(() {
@@ -162,27 +188,23 @@ class _ChatScreenState extends State<ChatScreen> {
       if (imageResponse.statusCode == 200) {
         final imageData = json.decode(imageResponse.body);
         setState(() {
-          // Find the message by its ID and update it
           final messageIndex = _messages.indexWhere((m) => m.id == messageId);
           if (messageIndex != -1) {
-            _messages[messageIndex].imageUrl_base64 = imageData['imageUrl_base64'];
-            _messages[messageIndex].isLoadingImage = false; // IMPORTANT: Set loading to false
+            _messages[messageIndex].imageUrl_base64 =
+                imageData['imageUrl_base64'];
+            _messages[messageIndex].isLoadingImage = false;
           }
         });
       }
     } catch (e) {
-      // Handle image generation error silently or show a placeholder
       print("Image generation failed: $e");
     }
   }
 
-  // --- UI BUILD METHOD ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AgapAI Financial Story'),
-      ),
+      appBar: AppBar(title: const Text('AgapAI Financial Story')),
       body: Column(
         children: [
           Expanded(
@@ -212,22 +234,13 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- The Image section ---
             if (message.isLoadingImage)
               const Center(child: CircularProgressIndicator())
             else if (message.imageUrl_base64 != null)
               Image.memory(base64Decode(message.imageUrl_base64!)),
-
             const SizedBox(height: 10),
-
-            // --- The Narrative text ---
-            Text(
-              message.narrative,
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text(message.narrative, style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 15),
-
-            // --- The Choice buttons ---
             if (!_isWaitingForResponse && message.choices.isNotEmpty)
               ...message.choices.map((choice) {
                 return Container(
