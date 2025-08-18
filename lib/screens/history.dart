@@ -1,217 +1,211 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-// --- DATA MODEL for a single history item ---
-class HistoryItem {
-  final String title;
-  final IconData icon;
-  final String summary;
-  final List<String> recommendedActions;
-  final bool isFinished;
-
-  HistoryItem({
-    required this.title,
-    required this.icon,
-    required this.summary,
-    this.recommendedActions = const [],
-    this.isFinished = true,
-  });
-}
-
-// --- HISTORY PAGE WIDGET ---
 class HistoryPage extends StatelessWidget {
-  HistoryPage({super.key});
+  const HistoryPage({super.key});
 
-  // --- DUMMY DATA ---
-  final List<HistoryItem> historyItems = [
-    HistoryItem(
-      title: "Starting a Cafe",
-      icon: FontAwesomeIcons.mugSaucer,
-      summary: "Explored the journey of opening a physical cafe, securing a traditional bank loan for funding.",
-      isFinished: true,
-      recommendedActions: [
-        "Draft a comprehensive business plan.",
-        "Compile two years of financial statements.",
-        "Improve credit score above 720.",
-        "Research local small business loans.",
-      ],
-    ),
-    HistoryItem(
-      title: "My First Home Loan",
-      icon: FontAwesomeIcons.houseChimney,
-      summary: "Simulated the process of applying for a home loan but stopped before choosing an interest rate plan.",
-      isFinished: false,
-    ),
-    HistoryItem(
-      title: "Retirement Plan",
-      icon: FontAwesomeIcons.solidSun,
-      summary: "Calculated the savings needed to retire comfortably by age 65 with an aggressive investment strategy.",
-      isFinished: true,
-      recommendedActions: [
-        "Open a Roth IRA account.",
-        "Contribute \$500 monthly.",
-        "Review portfolio allocation annually.",
-      ],
-    ),
-    HistoryItem(
-      title: "Emergency Fund",
-      icon: FontAwesomeIcons.shieldHalved,
-      summary: "Established a goal to save 6 months of living expenses.",
-      isFinished: true,
-      recommendedActions: [
-        "Set up automatic transfers to a high-yield savings account.",
-        "Reduce non-essential spending by 15%.",
-      ],
-    ),
-    HistoryItem(
-      title: "Car Purchase",
-      icon: FontAwesomeIcons.car,
-      summary: "Compared financing options for buying a new car, including dealership financing vs. a personal loan.",
-      isFinished: false,
-    ),
-  ];
+  void _showSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: GoogleFonts.poppins()),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final scenarios = [
+      {
+        "title": "Starting a Cafe",
+        "desc":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
+        "status": "Completed",
+        "action": "View Recommendations",
+      },
+      {
+        "title": "My First Home Loan",
+        "desc":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
+        "status": "Ongoing",
+        "action": "Continue",
+      },
+      {
+        "title": "Retirement Plan",
+        "desc":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
+        "status": "Completed",
+        "action": "View Recommendations",
+      },
+      {
+        "title": "Emergency Fund",
+        "desc":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
+        "status": "Completed",
+        "action": "View Recommendations",
+      },
+      {
+        "title": "Investment Plan",
+        "desc":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
+        "status": "Ongoing",
+        "action": "Continue",
+      },
+    ];
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: true,
-        title: const Text(
-          'My Scenarios',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF212529),
-          ),
-        ),
+        automaticallyImplyLeading: false,
+        title: Image.asset('assets/images/agapai_logo.png', height: 30),
       ),
+
       body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        // Using MasonryGridView for the uneven tiles effect
-        child: MasonryGridView.builder(
-          itemCount: historyItems.length,
-          gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-          ),
-          mainAxisSpacing: 12.0,
-          crossAxisSpacing: 12.0,
-          itemBuilder: (context, index) {
-            return _HistoryCard(item: historyItems[index]);
-          },
-        ),
-      ),
-    );
-  }
-}
-
-// --- CUSTOM HISTORY CARD WIDGET ---
-class _HistoryCard extends StatelessWidget {
-  final HistoryItem item;
-  const _HistoryCard({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header: Icon and Title
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              FaIcon(item.icon, color: const Color(0xFF0D47A1), size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  item.title,
-                  style: const TextStyle(
-                    color: Color(0xFF212529),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
-                  ),
-                ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "My Scenarios",
+              style: GoogleFonts.poppins(
+                fontSize: 23,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Summary Text
-          Text(
-            item.summary,
-            style: const TextStyle(
-              color: Color(0xFF495057),
-              fontSize: 14,
-              height: 1.4,
             ),
-          ),
-          const Divider(height: 24, color: Color(0xFFE9ECEF)),
-
-          // Conditional Content: Recommendations or CTA Button
-          if (item.isFinished)
-            _buildRecommendations(item.recommendedActions)
-          else
-            _buildContinueButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecommendations(List<String> actions) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Recommended Actions:',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF212529),
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 8),
-        // Create a checklist from the actions list
-        for (String action in actions)
-          Padding(
-            padding: const EdgeInsets.only(top: 6.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("✅ ", style: TextStyle(fontSize: 14)),
-                Expanded(
-                  child: Text(
-                    action,
-                    style: const TextStyle(fontSize: 14, color: Color(0xFF495057)),
-                  ),
+            const SizedBox(height: 4),
+            Text(
+              "Track your finished and ongoing what-if stories",
+              style: GoogleFonts.poppins(color: Colors.black54, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: GridView.builder(
+                itemCount: scenarios.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.8,
                 ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
+                itemBuilder: (context, index) {
+                  final item = scenarios[index];
+                  final isCompleted = item["status"] == "Completed";
 
-  Widget _buildContinueButton() {
-    return Center(
-      child: ElevatedButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.arrow_forward_ios, size: 14),
-        label: const Text('Continue Story'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF0D47A1),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.0),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Status Badge
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isCompleted
+                                  ? Colors.green.shade50
+                                  : Colors.orange.shade50,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              item["status"]!,
+                              style: GoogleFonts.poppins(
+                                color: isCompleted
+                                    ? Colors.green
+                                    : Colors.orange,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Placeholder image
+                        Container(
+                          height: 60,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.image,
+                            color: Colors.grey,
+                            size: 30,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Title
+                        Text(
+                          item["title"]!,
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // Description
+                        Expanded(
+                          child: Text(
+                            item["desc"]!,
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.black54,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: () => _showSnackbar(
+                            context,
+                            "${item["action"]} - Not yet working",
+                          ),
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                item["action"]!,
+                                style: GoogleFonts.poppins(
+                                  color: const Color(0xFFA42A25),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 13,
+                                color: Color(0xFFA42A25),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
