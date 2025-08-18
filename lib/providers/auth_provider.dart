@@ -8,11 +8,17 @@ class AuthProvider with ChangeNotifier {
   User? _user;
   User? get user => _user;
 
+  bool get isAuthenticated => _user != null;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
+
+  AuthProvider() {
+    _user = _authService.getCurrentUser();
+  }
 
   Future<String?> login(String email, String password) async {
     return await _authService.login(email, password);
