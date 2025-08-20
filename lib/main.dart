@@ -38,7 +38,7 @@ class AgapAIApp extends StatelessWidget {
     return MaterialApp(
       title: 'AgapAI',
       initialRoute:
-          '/chatbot', // TO-DO: Change the appropriate route for a specific page
+          '/profile', // TO-DO: Change the appropriate route for a specific page
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
