@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+// ADDED: Import the new files
+import 'chatbot_sample.dart';
+import '../models/chat_message_model.dart';
 
 class InitialMainPage extends StatefulWidget {
   const InitialMainPage({super.key});
@@ -9,22 +15,24 @@ class InitialMainPage extends StatefulWidget {
 }
 
 class _InitialMainPageState extends State<InitialMainPage> {
+  // ADDED: Controller for the text field and a loading state
+  final TextEditingController _storyController = TextEditingController();
+  bool _isLoading = false;
+
+  // ADDED: Define your backend base URL here
+  // !!! IMPORTANT: Replace with your computer's local IP address !!!
+  final String _baseUrl = "http://192.168.100.33:8000";
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    _storyController.dispose(); // ADDED: Dispose the controller
     super.dispose();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
   }
-
-  // State for the currently selected index in the BottomNavigationBar
-  int _selectedIndex = 1;
 
   // Colors extracted from the UI screenshot
   static const Color _primaryRed = Color(0xFFA42A25);
@@ -32,21 +40,90 @@ class _InitialMainPageState extends State<InitialMainPage> {
   static const Color _darkTextColor = Color(0xFF222222);
   static const Color _lightTextColor = Color(0xFF494949);
 
-  void _onItemTapped(int index) {
+  // --- ADDED: API and Navigation Logic ---
+  Future<void> _startStory(String prompt) async {
+    if (prompt.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a story idea.")),
+      );
+      return;
+    }
+
     setState(() {
-      _selectedIndex = index;
+      _isLoading = true;
     });
+
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/generate-story'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'user_input': prompt,
+          'initial_prompt': prompt,
+          'chat_history': []
+        }),
+      );
+
+      if (response.statusCode == 200 && mounted) {
+        // --- MODIFIED: Simplified parsing logic ---
+        // 1. Decode the JSON response body directly into a Map ONE TIME.
+        final Map<String, dynamic> storyData = json.decode(response.body);
+
+        // 2. Check for an error key within the decoded map.
+        if (storyData.containsKey('error')) {
+          throw Exception('Backend error: ${storyData['error']}');
+        }
+
+        // 3. Create the ChatMessage object from the map.
+        final initialScenario = ChatMessage(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          narrative: storyData['narrative'],
+          choices: List<String>.from(storyData['choices']),
+        );
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChatApp(initialScenario: initialScenario),
+          ),
+        );
+      } else {
+        throw Exception(
+            'Failed to start story. Status code: ${response.statusCode}. Body: ${response.body}');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("An error occurred: $e")),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // The background color of the scaffold is set to the primary red.
-      // This color will be visible at the top (behind the status bar)
-      // and during over-scrolling.
       backgroundColor: _primaryRed,
-      body: CustomScrollView(
-        slivers: [_buildSliverAppBar(), _buildContentSection()],
+      body: Stack( // MODIFIED: Added Stack to show a loading indicator
+        children: [
+          CustomScrollView(
+            slivers: [_buildSliverAppBar(), _buildContentSection()],
+          ),
+          // ADDED: Loading overlay
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -65,7 +142,7 @@ class _InitialMainPageState extends State<InitialMainPage> {
       automaticallyImplyLeading: false,
       elevation: 0,
       pinned:
-          true, // The app bar will remain visible at the top when collapsed.
+      true, // The app bar will remain visible at the top when collapsed.
       flexibleSpace: FlexibleSpaceBar(
         // The background of the flexible space bar.
         background: Stack(
@@ -79,7 +156,7 @@ class _InitialMainPageState extends State<InitialMainPage> {
                 BlendMode.overlay,
               ),
               child: Image.asset(
-                'images/chatbot_background.png',
+                'assets/images/chatbot_background.png',
                 fit: BoxFit.cover,
               ),
             ),
@@ -133,7 +210,6 @@ class _InitialMainPageState extends State<InitialMainPage> {
     );
   }
 
-  /// Builds the main scrollable content area with the white background.
   SliverToBoxAdapter _buildContentSection() {
     return SliverToBoxAdapter(
       child: Container(
@@ -155,14 +231,22 @@ class _InitialMainPageState extends State<InitialMainPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Story suggestion cards
-              _buildSuggestionCard(),
+              // MODIFIED: Story suggestion cards now have real text and are tappable
+              _buildSuggestionCard(
+                title: 'What if I start a small coffee cart?',
+                description: 'Explore the journey of turning a passion for coffee into a mobile business venture.',
+              ),
               const SizedBox(height: 12),
-              _buildSuggestionCard(),
+              _buildSuggestionCard(
+                title: 'What if I invest in a local franchise?',
+                description: 'Dive into the pros and cons of buying into an established brand versus starting from scratch.',
+              ),
               const SizedBox(height: 12),
-              _buildSuggestionCard(),
+              _buildSuggestionCard(
+                title: 'What if I expand my online shop?',
+                description: 'Navigate the challenges of scaling up, from marketing and logistics to managing inventory.',
+              ),
               const SizedBox(height: 32),
-              // User input section
               _buildStoryInput(),
             ],
           ),
@@ -171,36 +255,38 @@ class _InitialMainPageState extends State<InitialMainPage> {
     );
   }
 
-  /// Builds a single story suggestion card.
-  Widget _buildSuggestionCard() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: _cardBgColor,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Lorem ipsum?',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: _darkTextColor,
+  // MODIFIED: Now takes text and is wrapped in a GestureDetector
+  Widget _buildSuggestionCard({required String title, required String description}) {
+    return GestureDetector(
+      onTap: () => _startStory(title),
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: _cardBgColor,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: _darkTextColor,
+              ),
             ),
-          ),
-          SizedBox(height: 4),
-          Text(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            style: TextStyle(fontSize: 14, color: _lightTextColor, height: 1.4),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              description,
+              style: const TextStyle(fontSize: 14, color: _lightTextColor, height: 1.4),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  /// Builds the "Got a story in mind?" text input field.
   Widget _buildStoryInput() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,20 +301,25 @@ class _InitialMainPageState extends State<InitialMainPage> {
         ),
         const SizedBox(height: 8),
         TextField(
+          controller: _storyController, // MODIFIED: Assigned controller
           decoration: InputDecoration(
             hintText: "Type your own 'what-if' below.",
             hintStyle: const TextStyle(color: _lightTextColor),
             filled: true,
             fillColor: Colors.white,
-            // Custom suffix icon with background color and rounded corners
             suffixIcon: Padding(
               padding: const EdgeInsets.all(7.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: _primaryRed,
-                  borderRadius: BorderRadius.circular(12.0),
+              // MODIFIED: Wrapped icon in a tappable widget
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12.0),
+                onTap: () => _startStory(_storyController.text),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: _primaryRed,
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: const Icon(Icons.send, color: Colors.white, size: 20),
                 ),
-                child: const Icon(Icons.send, color: Colors.white, size: 20),
               ),
             ),
             border: OutlineInputBorder(

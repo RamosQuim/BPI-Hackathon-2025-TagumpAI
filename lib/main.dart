@@ -38,7 +38,7 @@ class AgapAIApp extends StatelessWidget {
     return MaterialApp(
       title: 'AgapAI',
       initialRoute:
-          '/chatbot', // TO-DO: Change the appropriate route for a specific page
+          '/navbar', // TO-DO: Change the appropriate route for a specific page
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
@@ -94,7 +94,7 @@ class AgapAIApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/main': (context) => InitialMainPage(),
-        '/chatbot': (context) => ChatApp(),
+        '/chatbot': (context) => InitialMainPage(),
         '/history': (context) => HistoryPage(),
         '/profile': (context) => ProfilePage(),
         '/navbar': (context) => MainNavigation(),

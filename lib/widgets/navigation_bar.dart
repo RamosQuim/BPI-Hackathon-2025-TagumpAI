@@ -1,5 +1,6 @@
 // This is the main screen widget which contains the swipeable pages and the bottom navigation bar.
 import 'package:flutter/material.dart';
+import 'package:test_app/screens/chatbot_sample.dart';
 import 'package:test_app/screens/history.dart';
 import 'package:test_app/screens/initial_chatbot.dart';
 import 'package:test_app/screens/profile.dart';
