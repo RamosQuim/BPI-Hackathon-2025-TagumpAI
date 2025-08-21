@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 // --- PROFILE PAGE WIDGET ---
 class ProfilePage extends StatefulWidget {
@@ -22,12 +26,18 @@ class ProfilePageState extends State<ProfilePage> {
     'Buy a Home',
     'Save for Retirement',
     'Emergency Fund',
-    'Run a Small Coffee Shop'
+    'Run a Small Coffee Shop',
   };
 
   // --- EDIT DIALOG HANDLER ---
-  Future<void> _showEditDialog(BuildContext context, String field, double currentValue) async {
-    final controller = TextEditingController(text: currentValue.toStringAsFixed(0));
+  Future<void> _showEditDialog(
+    BuildContext context,
+    String field,
+    double currentValue,
+  ) async {
+    final controller = TextEditingController(
+      text: currentValue.toStringAsFixed(0),
+    );
     final formKey = GlobalKey<FormState>();
 
     return showDialog<void>(
@@ -82,6 +92,19 @@ class ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  void logOut() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    try {
+      await authProvider.logout();
+
+      // navigate to the login screen or home page after logout
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +115,10 @@ class ProfilePageState extends State<ProfilePage> {
         centerTitle: true,
         title: const Text(
           'My Profile',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF212529)),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF212529),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -137,7 +163,11 @@ class ProfilePageState extends State<ProfilePage> {
                           icon: FontAwesomeIcons.wallet,
                           value: monthlyIncome,
                           color: Colors.green,
-                          onEdit: () => _showEditDialog(context, "Monthly Income", monthlyIncome),
+                          onEdit: () => _showEditDialog(
+                            context,
+                            "Monthly Income",
+                            monthlyIncome,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -147,7 +177,11 @@ class ProfilePageState extends State<ProfilePage> {
                           icon: FontAwesomeIcons.receipt,
                           value: monthlyExpenses,
                           color: Colors.red,
-                          onEdit: () => _showEditDialog(context, "Monthly Expenses", monthlyExpenses),
+                          onEdit: () => _showEditDialog(
+                            context,
+                            "Monthly Expenses",
+                            monthlyExpenses,
+                          ),
                         ),
                       ),
                     ],
@@ -163,12 +197,37 @@ class ProfilePageState extends State<ProfilePage> {
               child: Wrap(
                 spacing: 8.0,
                 runSpacing: 8.0,
-                children: _financialGoals.map((goal) => Chip(
-                  label: Text(goal),
-                  backgroundColor: Colors.blue.shade50,
-                  labelStyle: TextStyle(color: Colors.blue.shade800, fontWeight: FontWeight.w600),
-                  side: BorderSide.none,
-                )).toList(),
+                children: _financialGoals
+                    .map(
+                      (goal) => Chip(
+                        label: Text(goal),
+                        backgroundColor: Colors.blue.shade50,
+                        labelStyle: TextStyle(
+                          color: Colors.blue.shade800,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        side: BorderSide.none,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            Center(
+              child: InkWell(
+                onTap: () => logOut(),
+                child: DefaultTextStyle(
+                  style: GoogleFonts.inter(
+                    textStyle: const TextStyle(
+                      color: Color(0xFF494949),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  child: const Text('Log out'),
+                ),
               ),
             ),
           ],
@@ -187,7 +246,10 @@ class ProfilePageState extends State<ProfilePage> {
             const CircleAvatar(
               radius: 50,
               backgroundColor: Color(0xFF0D47A1),
-              child: Text("A", style: TextStyle(fontSize: 50, color: Colors.white)),
+              child: Text(
+                "A",
+                style: TextStyle(fontSize: 50, color: Colors.white),
+              ),
             ),
             Positioned(
               bottom: 0,
@@ -196,7 +258,11 @@ class ProfilePageState extends State<ProfilePage> {
                 radius: 18,
                 backgroundColor: Colors.white,
                 child: IconButton(
-                  icon: const Icon(Icons.edit, size: 20, color: Color(0xFF0D47A1)),
+                  icon: const Icon(
+                    Icons.edit,
+                    size: 20,
+                    color: Color(0xFF0D47A1),
+                  ),
                   onPressed: () {},
                 ),
               ),
@@ -206,12 +272,13 @@ class ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 12),
         Text(
           fullName,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black54),
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+          ),
         ),
-        Text(
-          email,
-          style: const TextStyle(fontSize: 16, color: Colors.grey),
-        ),
+        Text(email, style: const TextStyle(fontSize: 16, color: Colors.grey)),
       ],
     );
   }
@@ -222,7 +289,11 @@ class ProfilePageState extends State<ProfilePage> {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF495057)),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF495057),
+          ),
         ),
         const SizedBox(height: 12),
         Container(
@@ -261,7 +332,6 @@ class ProfilePageState extends State<ProfilePage> {
   }
 }
 
-
 // --- CUSTOM WIDGETS ---
 
 class _ProfileInfoTile extends StatelessWidget {
@@ -288,7 +358,9 @@ class _ProfileInfoTile extends StatelessWidget {
             label,
             style: const TextStyle(
               fontSize: 16,
-              color: Color(0xFF495057), // <-- ADDED: A slightly softer black for the label
+              color: Color(
+                0xFF495057,
+              ), // <-- ADDED: A slightly softer black for the label
             ),
           ),
           const Spacer(),
@@ -298,7 +370,9 @@ class _ProfileInfoTile extends StatelessWidget {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0D47A1), // <-- ADDED: Using your app's primary blue for the value
+              color: Color(
+                0xFF0D47A1,
+              ), // <-- ADDED: Using your app's primary blue for the value
             ),
           ),
         ],
@@ -332,7 +406,11 @@ class _FinancialDetailCard extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           currencyFormat.format(value),
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
         ),
         const SizedBox(height: 8),
         SizedBox(

@@ -3,7 +3,6 @@ import 'package:test_app/screens/chatbot.dart';
 import 'package:test_app/screens/chatbot_sample.dart';
 import 'package:test_app/screens/history.dart';
 import 'package:test_app/screens/initial_chatbot.dart';
-import 'package:test_app/screens/landing.dart';
 import 'package:test_app/screens/login.dart';
 import 'package:test_app/screens/onboarding.dart';
 import 'package:test_app/screens/profile.dart';
@@ -15,6 +14,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // You can run this code by placing it in your main.dart file
 // or calling LoginPage() from your main App widget.
@@ -30,15 +30,54 @@ void main() async {
   );
 }
 
-class AgapAIApp extends StatelessWidget {
+class AgapAIApp extends StatefulWidget {
   const AgapAIApp({super.key});
+
+  @override
+  State<AgapAIApp> createState() => _AgapAIAppState();
+}
+
+class _AgapAIAppState extends State<AgapAIApp> {
+  bool? isFirstTime;
+
+  @override
+  void initState() {
+    super.initState();
+    checkFirstTime();
+  }
+
+  Future<void> checkFirstTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    final firstTime = prefs.getBool('isFirstTime') ?? true;
+
+    // mark as opened after first launch
+    if (firstTime) {
+      prefs.setBool('isFirstTime', false);
+    }
+
+    setState(() {
+      isFirstTime = firstTime;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'AgapAI',
-      initialRoute:
-          '/navbar', // TO-DO: Change the appropriate route for a specific page
+      home: isFirstTime == null
+          ? const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ) // wait until prefs load
+          : Consumer<AuthProvider>(
+              builder: (context, authProvider, child) {
+                if (isFirstTime!) {
+                  return const OnboardingScreen();
+                }
+                return authProvider.isAuthenticated
+                    ? const MainNavigation()
+                    : const LoginPage();
+              },
+            ),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
@@ -90,11 +129,11 @@ class AgapAIApp extends StatelessWidget {
         ),
       ),
       routes: {
-        '/': (context) => const OnboardingScreen(),
+        '/onboard': (context) => const OnboardingScreen(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/main': (context) => InitialMainPage(),
-        '/chatbot': (context) => InitialMainPage(),
+        '/chatbot': (context) => ChatApp(),
         '/history': (context) => HistoryPage(),
         '/profile': (context) => ProfilePage(),
         '/navbar': (context) => MainNavigation(),
