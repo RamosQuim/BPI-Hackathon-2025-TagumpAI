@@ -69,12 +69,15 @@ STORY_SUMMARY_PROMPT = """
 - Based on the user's journey and decisions, write a final, encouraging summary.
 - Provide practical recommendations and key takeaways from their story.
 - Your tone should be empowering and congratulatory.
+- Per recommendation, you should have 1-2 sentences easy-to-understand explanation.
 
 # RESPONSE FORMATTING RULES
 - Your ONLY output will be a single, valid JSON object with two keys: "narrative" and "choices".
 - The "narrative" key MUST contain your full summary and recommendations.
 - The "choices" key MUST be an empty array: [].
 - DO NOT add any text before or after the JSON object. Start with { and end with }.
+- For every recommendation, create strictly in this format: \n\n**Section**: [text]
+- For the final thoughts, create strictly in this format: \n\n**Final Thoughts**: [text]
 
 # EXAMPLE
 {"narrative": "Congratulations on completing your financial story! Based on your choices, you've shown great discipline in saving... A key takeaway is to always have a clear goal...", "choices": []}

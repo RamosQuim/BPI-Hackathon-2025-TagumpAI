@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:test_app/widgets/loading.dart';
 
 // ADDED: Import the new files
 import 'chatbot_sample.dart';
@@ -65,21 +66,20 @@ class _InitialMainPageState extends State<InitialMainPage> {
       );
 
       if (response.statusCode == 200 && mounted) {
-        // --- MODIFIED: Simplified parsing logic ---
-        // 1. Decode the JSON response body directly into a Map ONE TIME.
         final Map<String, dynamic> storyData = json.decode(response.body);
 
-        // 2. Check for an error key within the decoded map.
         if (storyData.containsKey('error')) {
           throw Exception('Backend error: ${storyData['error']}');
         }
 
-        // 3. Create the ChatMessage object from the map.
         final initialScenario = ChatMessage(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           narrative: storyData['narrative'],
           choices: List<String>.from(storyData['choices']),
         );
+
+        // --- FIX: Clear the text field before navigating ---
+        _storyController.clear();
 
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -116,13 +116,7 @@ class _InitialMainPageState extends State<InitialMainPage> {
             slivers: [_buildSliverAppBar(), _buildContentSection()],
           ),
           // ADDED: Loading overlay
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.5),
-              child: const Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              ),
-            ),
+          if (_isLoading) const AnimatedLoadingIndicator(),
         ],
       ),
     );

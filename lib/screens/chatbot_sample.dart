@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:test_app/widgets/loading.dart';
 import 'dart:convert';
 
 // ADDED: Import the model file
@@ -112,7 +113,6 @@ class _ChatAppState extends State<ChatApp> {
     }
   }
 
-  // ... the rest of your _ChatAppState class remains the same ...
   void _showErrorScenario(String errorText) {
     setState(() {
       _currentScenario = ChatMessage(
@@ -130,151 +130,298 @@ class _ChatAppState extends State<ChatApp> {
     const Color primaryRed = Color(0xFFB71C1C);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: true, // Set to true to show back button
-        iconTheme: const IconThemeData(color: Colors.black87),
-        title: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          child: Image.asset(
-            'assets/images/agapai_logo.png',
-            height: 30,
-          ),
-        ),
-      ),
       backgroundColor: Colors.white,
       body: _isWaitingForResponse
-          ? const Center(child: CircularProgressIndicator(color: primaryRed,))
+          ? const AnimatedLoadingIndicator()
           : _currentScenario == null
           ? const Center(child: Text("Loading your story..."))
-          : _buildScenarioPage(_currentScenario!),
+          : Column(
+        children: [
+          Expanded(
+            child: _buildScenarioPage(_currentScenario!),
+          ),
+          _buildBottomButton(_currentScenario!),
+        ],
+      ),
     );
   }
 
-  // --- MODIFIED: This widget now handles both states ---
+  // --- Widget Build Logic (No changes here) ---
   Widget _buildScenarioPage(ChatMessage scenario) {
-    const Color primaryRed = Color(0xFFB71C1C);
-    const Color lightGrey = Color(0xFFF5F5F5);
-
-    // This boolean checks if the story is over.
     final bool isStoryFinished = scenario.choices.isEmpty;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            // Show a different title for the final screen
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          backgroundColor: Colors.white,
+          title: Text(
             isStoryFinished ? 'Your Financial Summary' : 'Your Financial Story',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: primaryRed,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+          ),
+          pinned: true,
+          expandedHeight: 250.0,
+          iconTheme: const IconThemeData(color: Colors.black87),
+          flexibleSpace: FlexibleSpaceBar(
+            background: Image.asset(
+              'assets/images/chatbot_background.png',
+              fit: BoxFit.cover,
+              color: Colors.black.withOpacity(0.4),
+              colorBlendMode: BlendMode.darken,
             ),
           ),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-              color: lightGrey,
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: Text(
-              scenario.narrative,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
-                height: 1.5,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
+        ),
+        if (isStoryFinished)
+          _buildStorySummarySliver(scenario)
+        else
+          _buildInteractiveStorySliver(scenario),
+      ],
+    );
+  }
 
-          // --- LOGIC CHANGE: Conditionally show choices or a restart button ---
-          if (isStoryFinished)
-          // If the story is finished, show the "Start New Story" button
-            ElevatedButton(
-              onPressed: () {
-                // Navigate back to the screen with the route name '/navbar'.
-                // This pops all routes until it finds the '/navbar' route.
-                Navigator.of(context).popUntil((route) => route.settings.name == '/navbar');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryRed,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
+  // --- MAJOR UPDATE: This widget now parses the summary into cards ---
+  Widget _buildStorySummarySliver(ChatMessage scenario) {
+    final List<Map<String, String>> recommendations = [];
+    String introText = scenario.narrative;
+    String? conclusionText; // Use nullable string for clarity
+
+    const listDelimiter = "\n\n**";
+
+    if (scenario.narrative.contains(listDelimiter)) {
+      final parts = scenario.narrative.split(listDelimiter);
+      introText = parts.first.trim();
+
+      for (int i = 1; i < parts.length; i++) {
+        final item = parts[i];
+        final cardParts = item.split('**: ');
+
+        if (cardParts.length == 2) {
+          final title = cardParts[0].trim();
+          final content = cardParts[1].trim();
+
+          // --- FIX: Check the title to identify the conclusion ---
+          if (title == "Final Thoughts") {
+            conclusionText = content; // Assign to conclusion variable
+          } else {
+            // If it's not the conclusion, add it to the recommendations list
+            recommendations.add({'title': title, 'content': content});
+          }
+        }
+      }
+    }
+
+    // --- UI Build Logic (No changes needed here) ---
+    return SliverPadding(
+      padding: const EdgeInsets.all(24.0),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate(
+          [
+            const Text(
+              "Your Story's Conclusion",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              introText,
+              style:
+              TextStyle(fontSize: 16, color: Colors.grey[700], height: 1.5),
+            ),
+            const SizedBox(height: 32),
+            if (recommendations.isNotEmpty)
+              const Text(
+                "Key Recommendations",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87),
               ),
-              child: const Text(
-                'Start a New Story',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            const SizedBox(height: 16),
+            ...recommendations.map((rec) => _buildRecommendationCard(
+              title: rec['title']!,
+              content: rec['content']!,
+            )),
+            if (conclusionText != null && conclusionText.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              const Text(
+                "Final Thoughts",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87),
               ),
-            )
-          else
-          // If the story is ongoing, show the choices and the submit button
-            Column(
+              const SizedBox(height: 16),
+              Text(
+                conclusionText,
+                style: TextStyle(
+                    fontSize: 16, color: Colors.grey[700], height: 1.5),
+              ),
+            ],
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // --- NEW WIDGET: A styled card for displaying a single recommendation ---
+  Widget _buildRecommendationCard({required String title, required String content}) {
+    const Color primaryRed = Color(0xFFB71C1C);
+
+    return Card(
+      elevation: 2.0,
+      margin: const EdgeInsets.only(bottom: 16.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ...scenario.choices.map((choice) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: DecisionCard(
-                      text: choice,
-                      isSelected: _selectedChoice == choice,
-                      onTap: () {
-                        setState(() {
-                          _selectedChoice = choice;
-                        });
-                      },
-                    ),
-                  );
-                }).toList(),
-
-                // ADDED: Always include the "Finish my story" option
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: DecisionCard(
-                    text: 'Finish my story',
-                    isSelected: _selectedChoice == 'Finish my story',
-                    onTap: () {
-                      setState(() {
-                        _selectedChoice = 'Finish my story';
-                      });
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: (_selectedChoice != null && !_isWaitingForResponse) ? _submitDecision : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryRed,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    elevation: 2,
-                  ),
-                  child: const Text(
-                    'Submit Decision',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Icon(_getIconForTitle(title), color: primaryRed, size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                 ),
               ],
             ),
-        ],
+            const SizedBox(height: 12),
+            const Divider(),
+            const SizedBox(height: 12),
+            Text(
+              content,
+              style: TextStyle(fontSize: 15, color: Colors.grey.shade800, height: 1.5),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // --- NEW WIDGET: Helper function to select an icon based on the card's title ---
+  IconData _getIconForTitle(String title) {
+    final lowerTitle = title.toLowerCase();
+    if (lowerTitle.contains('saving') || lowerTitle.contains('investment')) return Icons.savings_outlined;
+    if (lowerTitle.contains('risk')) return Icons.trending_up_outlined;
+    if (lowerTitle.contains('funding')) return Icons.account_balance_wallet_outlined;
+    if (lowerTitle.contains('customer')) return Icons.groups_outlined;
+    if (lowerTitle.contains('adaptability')) return Icons.sync_alt_outlined;
+    if (lowerTitle.contains('management')) return Icons.calculate_outlined;
+    return Icons.lightbulb_outline; // Default icon
+  }
+
+  // --- Interactive Story Widget (No changes here) ---
+  Widget _buildInteractiveStorySliver(ChatMessage scenario) {
+    const Color lightGrey = Color(0xFFF5F5F5);
+
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate(
+          [
+            Container(
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: lightGrey,
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Text(
+                scenario.narrative,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black87,
+                  height: 1.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ...scenario.choices.map((choice) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: DecisionCard(
+                  text: choice,
+                  isSelected: _selectedChoice == choice,
+                  onTap: () {
+                    setState(() {
+                      _selectedChoice = choice;
+                    });
+                  },
+                ),
+              );
+            }).toList(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: DecisionCard(
+                text: 'Finish my story',
+                isSelected: _selectedChoice == 'Finish my story',
+                onTap: () {
+                  setState(() {
+                    _selectedChoice = 'Finish my story';
+                  });
+                },
+              ),
+            ),
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // --- Bottom Button Widget (No changes here) ---
+  Widget _buildBottomButton(ChatMessage scenario) {
+    const Color primaryRed = Color(0xFFB71C1C);
+    final bool isStoryFinished = scenario.choices.isEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+      child: isStoryFinished
+          ? ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryRed,
+          foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 50),
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+        ),
+        child: const Text('Return to Home', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      )
+          : ElevatedButton(
+        onPressed: (_selectedChoice != null && !_isWaitingForResponse) ? _submitDecision : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryRed,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: Colors.grey.shade300,
+          minimumSize: const Size(double.infinity, 50),
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          elevation: 2,
+        ),
+        child: const Text('Submit Decision', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
       ),
     );
   }
 }
 
+// --- Decision Card Widget (No changes here) ---
 class DecisionCard extends StatelessWidget {
-  // ... No changes needed here
   final String text;
   final bool isSelected;
   final VoidCallback onTap;
@@ -296,7 +443,6 @@ class DecisionCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          // Change color and border based on selection state
             color: isSelected ? primaryRed : Colors.white,
             borderRadius: BorderRadius.circular(12.0),
             border: isSelected ? null : Border.all(color: Colors.grey.shade300, width: 1.5),
@@ -305,7 +451,7 @@ class DecisionCard extends StatelessWidget {
                 color: Colors.grey.withOpacity(0.1),
                 spreadRadius: 1,
                 blurRadius: 5,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               )
             ]
         ),
@@ -313,7 +459,6 @@ class DecisionCard extends StatelessWidget {
           text,
           textAlign: TextAlign.center,
           style: TextStyle(
-            // Change text color based on selection state
             color: isSelected ? Colors.white : Colors.black87,
             fontSize: 14,
             height: 1.4,
