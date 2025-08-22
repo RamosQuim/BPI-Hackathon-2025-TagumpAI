@@ -69,7 +69,7 @@ class _InitialMainPageState extends State<InitialMainPage> {
         final Map<String, dynamic> storyData = json.decode(response.body);
 
         if (storyData.containsKey('error')) {
-          throw Exception('Backend error: ${storyData['error']}');
+          throw Exception('Something went wrong.');
         }
 
         final initialScenario = ChatMessage(
@@ -227,18 +227,20 @@ class _InitialMainPageState extends State<InitialMainPage> {
               const SizedBox(height: 16),
               // MODIFIED: Story suggestion cards now have real text and are tappable
               _buildSuggestionCard(
-                title: 'What if I start a small coffee cart?',
-                description: 'Explore the journey of turning a passion for coffee into a mobile business venture.',
+                title: 'What if I get my first credit card?',
+                description: 'Learn to build credit responsibly, manage spending, and avoid common debt traps.',
               ),
               const SizedBox(height: 12),
+              // 2. Retirement Suggestion
               _buildSuggestionCard(
-                title: 'What if I invest in a local franchise?',
-                description: 'Dive into the pros and cons of buying into an established brand versus starting from scratch.',
+                title: 'What if I start investing for retirement?',
+                description: 'Discover the power of compound interest and explore options for a secure future.',
               ),
               const SizedBox(height: 12),
+              // 3. MSME Suggestion
               _buildSuggestionCard(
-                title: 'What if I expand my online shop?',
-                description: 'Navigate the challenges of scaling up, from marketing and logistics to managing inventory.',
+                title: 'What if I turn my hobby into a freelance business?',
+                description: 'Explore how to market your skills, find clients, and manage the finances of a small enterprise.',
               ),
               const SizedBox(height: 32),
               _buildStoryInput(),

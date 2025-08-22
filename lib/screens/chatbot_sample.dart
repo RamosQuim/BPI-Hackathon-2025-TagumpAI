@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_app/widgets/loading.dart';
 import 'dart:convert';
+import 'dart:math';
 
 // ADDED: Import the model file
 import '../models/chat_message_model.dart';
@@ -25,19 +26,19 @@ class _ChatAppState extends State<ChatApp> {
   ChatMessage? _currentScenario;
   String? _selectedChoice;
   bool _isWaitingForResponse = false;
-
-  // ADDED: A list to maintain the full conversation history.
   final List<Map<String, String>> _chatHistory = [];
-
   final String _baseUrl = "http://192.168.100.33:8000";
+  late String _backgroundImagePath;
 
   @override
   void initState() {
     super.initState();
     _currentScenario = widget.initialScenario;
 
+    // Use the new helper method to set the initial image
+    _backgroundImagePath = _getNewRandomImagePath();
+
     if (_currentScenario != null) {
-      // ADDED: Start the history with the initial story narrative from the AI.
       _chatHistory.add({
         'role': 'CHATBOT',
         'message': _currentScenario!.narrative
@@ -45,7 +46,14 @@ class _ChatAppState extends State<ChatApp> {
     }
   }
 
-  // --- API CALL LOGIC ---
+  // --- NEW: A reusable method to get a random image path ---
+  String _getNewRandomImagePath() {
+    // IMPORTANT: Change this number to match how many story images you have.
+    const int totalStoryImages = 10;
+    final int randomImageNumber = Random().nextInt(totalStoryImages) + 1; // Generates 1 to 5
+    return 'assets/images/story$randomImageNumber.jpg';
+  }
+
   Future<void> _submitDecision() async {
     if (_selectedChoice == null) return;
 
@@ -54,7 +62,6 @@ class _ChatAppState extends State<ChatApp> {
     });
 
     try {
-      // ADDED: Add the user's selected choice to the history before the API call.
       _chatHistory.add({
         'role': 'USER',
         'message': _selectedChoice!
@@ -63,7 +70,6 @@ class _ChatAppState extends State<ChatApp> {
       final storyResponse = await http.post(
         Uri.parse('$_baseUrl/generate-story'),
         headers: {'Content-Type': 'application/json'},
-        // MODIFIED: Send the complete chat history.
         body: json.encode({
           'user_input': _selectedChoice!,
           'chat_history': _chatHistory
@@ -71,8 +77,6 @@ class _ChatAppState extends State<ChatApp> {
       );
 
       if (storyResponse.statusCode == 200 && mounted) {
-        // --- MODIFIED: Simplified parsing logic ---
-        // 1. Decode the JSON response body directly into a Map ONE TIME.
         final Map<String, dynamic> storyData = json.decode(storyResponse.body);
 
         if (storyData.containsKey('error')) {
@@ -87,21 +91,20 @@ class _ChatAppState extends State<ChatApp> {
           isLoadingImage: true,
         );
 
-        // ADDED: Add the AI's new response to the history.
         _chatHistory.add({
           'role': 'CHATBOT',
           'message': newScenario.narrative
         });
 
+        // Get a new random image path before updating the state
+        final newImagePath = _getNewRandomImagePath();
+
         setState(() {
           _currentScenario = newScenario;
           _selectedChoice = null;
           _isWaitingForResponse = false;
+          _backgroundImagePath = newImagePath; // Update the background image path
         });
-
-        // You can re-enable image generation here if you wish
-        // _generateAndSetImage(newScenario.id, newScenario.narrative);
-
       } else {
         if (mounted) {
           _showErrorScenario(
@@ -127,8 +130,6 @@ class _ChatAppState extends State<ChatApp> {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryRed = Color(0xFFB71C1C);
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: _isWaitingForResponse
@@ -146,7 +147,7 @@ class _ChatAppState extends State<ChatApp> {
     );
   }
 
-  // --- Widget Build Logic (No changes here) ---
+  // ... rest of your code remains the same ...
   Widget _buildScenarioPage(ChatMessage scenario) {
     final bool isStoryFinished = scenario.choices.isEmpty;
 
@@ -154,19 +155,15 @@ class _ChatAppState extends State<ChatApp> {
       slivers: [
         SliverAppBar(
           backgroundColor: Colors.white,
-          title: Text(
-            isStoryFinished ? 'Your Financial Summary' : 'Your Financial Story',
-            style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
-          ),
           pinned: true,
           expandedHeight: 250.0,
           iconTheme: const IconThemeData(color: Colors.black87),
           flexibleSpace: FlexibleSpaceBar(
             background: Image.asset(
-              'assets/images/chatbot_background.png',
+              isStoryFinished ? 'assets/images/success.jpg' : _backgroundImagePath,
               fit: BoxFit.cover,
               color: Colors.black.withOpacity(0.4),
-              colorBlendMode: BlendMode.darken,
+              colorBlendMode: BlendMode.lighten,
             ),
           ),
         ),
@@ -178,11 +175,10 @@ class _ChatAppState extends State<ChatApp> {
     );
   }
 
-  // --- MAJOR UPDATE: This widget now parses the summary into cards ---
   Widget _buildStorySummarySliver(ChatMessage scenario) {
     final List<Map<String, String>> recommendations = [];
     String introText = scenario.narrative;
-    String? conclusionText; // Use nullable string for clarity
+    String? conclusionText;
 
     const listDelimiter = "\n\n**";
 
@@ -198,23 +194,20 @@ class _ChatAppState extends State<ChatApp> {
           final title = cardParts[0].trim();
           final content = cardParts[1].trim();
 
-          // --- FIX: Check the title to identify the conclusion ---
           if (title == "Final Thoughts") {
-            conclusionText = content; // Assign to conclusion variable
+            conclusionText = content;
           } else {
-            // If it's not the conclusion, add it to the recommendations list
             recommendations.add({'title': title, 'content': content});
           }
         }
       }
     }
 
-    // --- UI Build Logic (No changes needed here) ---
     return SliverPadding(
       padding: const EdgeInsets.all(24.0),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate(
-          [
+      sliver: SliverToBoxAdapter(
+        child: Column(
+          children: [
             const Text(
               "Your Story's Conclusion",
               textAlign: TextAlign.center,
@@ -266,10 +259,8 @@ class _ChatAppState extends State<ChatApp> {
     );
   }
 
-  // --- NEW WIDGET: A styled card for displaying a single recommendation ---
   Widget _buildRecommendationCard({required String title, required String content}) {
     const Color primaryRed = Color(0xFFB71C1C);
-
     return Card(
       elevation: 2.0,
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -308,7 +299,6 @@ class _ChatAppState extends State<ChatApp> {
     );
   }
 
-  // --- NEW WIDGET: Helper function to select an icon based on the card's title ---
   IconData _getIconForTitle(String title) {
     final lowerTitle = title.toLowerCase();
     if (lowerTitle.contains('saving') || lowerTitle.contains('investment')) return Icons.savings_outlined;
@@ -317,19 +307,20 @@ class _ChatAppState extends State<ChatApp> {
     if (lowerTitle.contains('customer')) return Icons.groups_outlined;
     if (lowerTitle.contains('adaptability')) return Icons.sync_alt_outlined;
     if (lowerTitle.contains('management')) return Icons.calculate_outlined;
-    return Icons.lightbulb_outline; // Default icon
+    return Icons.lightbulb_outline;
   }
 
-  // --- Interactive Story Widget (No changes here) ---
   Widget _buildInteractiveStorySliver(ChatMessage scenario) {
     const Color lightGrey = Color(0xFFF5F5F5);
 
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-      sliver: SliverList(
-        delegate: SliverChildListDelegate(
-          [
+      sliver: SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(20.0),
               decoration: BoxDecoration(
                 color: lightGrey,
@@ -378,7 +369,6 @@ class _ChatAppState extends State<ChatApp> {
     );
   }
 
-  // --- Bottom Button Widget (No changes here) ---
   Widget _buildBottomButton(ChatMessage scenario) {
     const Color primaryRed = Color(0xFFB71C1C);
     final bool isStoryFinished = scenario.choices.isEmpty;
@@ -420,7 +410,6 @@ class _ChatAppState extends State<ChatApp> {
   }
 }
 
-// --- Decision Card Widget (No changes here) ---
 class DecisionCard extends StatelessWidget {
   final String text;
   final bool isSelected;

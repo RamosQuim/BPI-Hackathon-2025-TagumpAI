@@ -42,7 +42,7 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
       child: Container(
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.white.withOpacity(0.2),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -98,13 +98,13 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
                   );
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               const Text(
                 'Processing Story...',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFFA42A25),
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
