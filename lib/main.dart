@@ -133,6 +133,7 @@ class _AgapAIAppState extends State<AgapAIApp> {
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/main': (context) => InitialMainPage(),
+        // '/chatbot': (context) => ChatApp(),
         '/history': (context) => HistoryPage(),
         '/profile': (context) => ProfilePage(),
         '/navbar': (context) => MainNavigation(),

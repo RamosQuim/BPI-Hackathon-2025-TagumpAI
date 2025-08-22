@@ -53,9 +53,11 @@ class _MainNavigationState extends State<MainNavigation> {
     final double itemWidth = screenWidth / itemCount;
     const double indicatorWidth = 60; // Width of the indicator line
     // Calculate the left offset for the indicator to be centered on the active item.
-    final double indicatorPosition = (_selectedIndex * itemWidth) + (itemWidth / 2) - (indicatorWidth / 2);
+    final double indicatorPosition =
+        (_selectedIndex * itemWidth) + (itemWidth / 2) - (indicatorWidth / 2);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       // PageView is a scrollable list that works page by page.
       // It's what allows the user to swipe between screens.
       body: PageView(
@@ -87,7 +89,10 @@ class _MainNavigationState extends State<MainNavigation> {
                 label: 'History',
               ),
               NavigationDestination(
-                selectedIcon: Icon(Icons.science_rounded, color: Color(0xFFA42A25)),
+                selectedIcon: Icon(
+                  Icons.science_rounded,
+                  color: Color(0xFFA42A25),
+                ),
                 icon: Icon(Icons.science_outlined),
                 label: 'Sandbox',
               ),
