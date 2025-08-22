@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:test_app/screens/profile_personal_info.dart';
 
 // --- ACCOUNT PAGE (Profile) ---
 class ProfilePage extends StatelessWidget {
@@ -7,40 +9,36 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: true,
-        title: const Text(
-          'Account',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset("assets/logo.png"), // replace with your logo
-        ),
+        automaticallyImplyLeading: false,
+        title: Image.asset('assets/images/agapai_logo.png', height: 30),
       ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 8),
             Row(
               children: [
                 const CircleAvatar(
                   radius: 35,
-                  backgroundImage: AssetImage("assets/profile.jpg"), // dummy profile
+                  backgroundImage: AssetImage("assets/icons/profile.png"), // dummy profile
                 ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("Andrew Ainsley",
+                    Text("Juan Dela Cruz",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text("andrew.ainsley@yourdomain.com",
-                        style: TextStyle(color: Colors.grey)),
+                    SizedBox(height: 4,),
+                    Text("juandelacruz@gmail.com",
+                        style: TextStyle(fontSize: 16, color: Colors.grey)),
                   ],
                 ),
               ],
@@ -49,21 +47,51 @@ class ProfilePage extends StatelessWidget {
 
             // Discover Card
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.red[700],
-                borderRadius: BorderRadius.circular(12),
+                color: const Color(0xFFA42A25),
+                borderRadius: BorderRadius.circular(24),
+                // --- SHADOW ADDED HERE ---
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 4), // changes position of shadow
+                  ),
+                ],
               ),
               child: Row(
-                children: const [
-                  Icon(Icons.star, color: Colors.white, size: 28),
+                children: [
+                  Image.asset(
+                    'assets/icons/premium.png',
+                    width: 70,
+                    height: 70,
+                  ),
                   SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      "Discover BPI products\nChoose what suits your lifestyle",
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    child: Column(
+                      // Aligns the text to the left
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Discover BPI products",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18, // Adjusted font size for better fit
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 4), // Adds space between the texts
+                        const Text(
+                          "Choose what suits your lifestyle",
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ],
                     ),
                   ),
+                  SizedBox(width: 12),
+                  Icon(Icons.chevron_right, color: Colors.white,)
                 ],
               ),
             ),
@@ -71,208 +99,65 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(height: 30),
             const Text("General", style: TextStyle(color: Colors.grey)),
             ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: const Text("Personal Info"),
+              leading: const Icon(Icons.person_outline_rounded),
+              title: const Text("Personal Info", style: TextStyle(fontWeight: FontWeight.w500)),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const PersonalInfoPage()),
+                  // Replace MaterialPageRoute with PageRouteBuilder
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => const PersonalInfoPage(),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      // Define the start and end positions for the slide
+                      const begin = Offset(-1.0, 0.0); // Start from the bottom
+                      const end = Offset.zero; // End at the original position (no offset)
+                      const curve = Curves.easeInOut;
+
+                      // Create the animation tween
+                      final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                      final offsetAnimation = animation.drive(tween);
+
+                      // Return the SlideTransition widget
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
+                    transitionDuration: const Duration(milliseconds: 400), // Optional: Adjust speed
+                  ),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.language),
-              title: const Text("Language"),
-              trailing: const Text("English (US)"),
+              title: const Text("Language", style: TextStyle(fontWeight: FontWeight.w500)),
+              trailing: const Text("English (Philippines)"),
             ),
 
             const SizedBox(height: 16),
             const Text("About", style: TextStyle(color: Colors.grey)),
             ListTile(
               leading: const Icon(Icons.help_outline),
-              title: const Text("Help Center"),
+              title: const Text("Help Center", style: TextStyle(fontWeight: FontWeight.w500)),
               trailing: const Icon(Icons.chevron_right),
             ),
             ListTile(
-              leading: const Icon(Icons.lock_outline),
-              title: const Text("Privacy Policy"),
+              leading: const Icon(Icons.lock_outline_rounded),
+              title: const Text("Privacy Policy", style: TextStyle(fontWeight: FontWeight.w500)),
               trailing: const Icon(Icons.chevron_right),
             ),
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: const Text("About ChattyAI"),
+              title: const Text("About AgapAI", style: TextStyle(fontWeight: FontWeight.w500)),
               trailing: const Icon(Icons.chevron_right),
             ),
             ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
+              leading: const Icon(Icons.logout_rounded, color: Color(0xFFA42A25)),
               title: const Text("Logout",
-                  style: TextStyle(color: Colors.red)),
+                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500)),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// --- PERSONAL INFO PAGE ---
-class PersonalInfoPage extends StatefulWidget {
-  const PersonalInfoPage({super.key});
-
-  @override
-  State<PersonalInfoPage> createState() => _PersonalInfoPageState();
-}
-
-class _PersonalInfoPageState extends State<PersonalInfoPage> {
-  final _formKey = GlobalKey<FormState>();
-
-  String? age;
-  String? incomeSource;
-  String? monthlyIncome;
-  String? monthlyExpenses;
-
-  bool hasPension = false;
-  List<String> pensions = [];
-
-  bool hasInsurance = false;
-  List<String> insurances = [];
-
-  bool hasInvestments = false;
-  List<String> investments = [];
-
-  List<String> financialGoals = [];
-  final List<String> availableGoals = [
-    "Save More",
-    "Retirement",
-    "Travel",
-    "Emergency Fund",
-    "Pay Debt"
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Personal Information")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Age
-              TextFormField(
-                decoration: const InputDecoration(labelText: "Age"),
-                keyboardType: TextInputType.number,
-                onSaved: (val) => age = val,
-              ),
-              // Source of Income
-              TextFormField(
-                decoration: const InputDecoration(labelText: "Source of Income"),
-                onSaved: (val) => incomeSource = val,
-              ),
-              // Monthly Income
-              TextFormField(
-                decoration: const InputDecoration(labelText: "Monthly Income"),
-                keyboardType: TextInputType.number,
-                onSaved: (val) => monthlyIncome = val,
-              ),
-              // Monthly Expenses
-              TextFormField(
-                decoration: const InputDecoration(labelText: "Monthly Expenses"),
-                keyboardType: TextInputType.number,
-                onSaved: (val) => monthlyExpenses = val,
-              ),
-              const SizedBox(height: 20),
-
-              // Pension
-              SwitchListTile(
-                title: const Text("Has Pension?"),
-                value: hasPension,
-                onChanged: (val) => setState(() => hasPension = val),
-              ),
-              if (hasPension)
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: "List of Pensions (comma separated)",
-                  ),
-                  onSaved: (val) =>
-                      pensions = val?.split(",").map((e) => e.trim()).toList() ??
-                          [],
-                ),
-
-              // Insurance
-              SwitchListTile(
-                title: const Text("Has Insurance?"),
-                value: hasInsurance,
-                onChanged: (val) => setState(() => hasInsurance = val),
-              ),
-              if (hasInsurance)
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: "List of Active Insurance (comma separated)",
-                  ),
-                  onSaved: (val) =>
-                      insurances = val?.split(",").map((e) => e.trim()).toList() ??
-                          [],
-                ),
-
-              // Investments
-              SwitchListTile(
-                title: const Text("Has Investments?"),
-                value: hasInvestments,
-                onChanged: (val) => setState(() => hasInvestments = val),
-              ),
-              if (hasInvestments)
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: "List of Active Investments (comma separated)",
-                  ),
-                  onSaved: (val) =>
-                      investments =
-                          val?.split(",").map((e) => e.trim()).toList() ?? [],
-                ),
-
-              const SizedBox(height: 20),
-              const Text("Financial Goals", style: TextStyle(fontWeight: FontWeight.bold)),
-              Wrap(
-                spacing: 8,
-                children: availableGoals.map((goal) {
-                  final selected = financialGoals.contains(goal);
-                  return FilterChip(
-                    label: Text(goal),
-                    selected: selected,
-                    onSelected: (val) {
-                      setState(() {
-                        if (val) {
-                          financialGoals.add(goal);
-                        } else {
-                          financialGoals.remove(goal);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 30),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      // TODO: Save to database or provider
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Personal Info Saved!")),
-                      );
-                    }
-                  },
-                  child: const Text("Save"),
-                ),
-              )
-            ],
-          ),
         ),
       ),
     );

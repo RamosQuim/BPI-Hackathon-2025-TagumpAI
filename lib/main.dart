@@ -82,6 +82,16 @@ class _AgapAIAppState extends State<AgapAIApp> {
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: const Color(0xFFA42A25),
+        snackBarTheme: const SnackBarThemeData(
+          backgroundColor: Color(0xFFFFEECD),
+          contentTextStyle: TextStyle(
+            fontSize: 14,
+            color: Color(0xFFC16306),
+          ),
+
+          // 3. (Optional) Set the color for the action button text
+          actionTextColor: Colors.white,
+        ),
         // Using Material 3 theming for the Gmail-style navigation bar
         useMaterial3: true,
         // Adding a touch of modern feel with a different splash factory
