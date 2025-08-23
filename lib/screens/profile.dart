@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:test_app/screens/profile_personal_info.dart';
+
+import '../providers/auth_provider.dart';
 
 // --- ACCOUNT PAGE (Profile) ---
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
+
+  void logOut(context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    try {
+      await authProvider.logout();
+
+      // navigate to the login screen or home page after logout
+      Navigator.of(context).pushReplacementNamed('/login');
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,18 +43,26 @@ class ProfilePage extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 35,
-                  backgroundImage: AssetImage("assets/icons/profile.png"), // dummy profile
+                  backgroundImage: AssetImage(
+                    "assets/icons/profile.png",
+                  ), // dummy profile
                 ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("Juan Dela Cruz",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 4,),
-                    Text("juandelacruz@gmail.com",
-                        style: TextStyle(fontSize: 16, color: Colors.grey)),
+                    Text(
+                      "Juan Dela Cruz",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      "juandelacruz@gmail.com",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
                   ],
                 ),
               ],
@@ -82,7 +106,9 @@ class ProfilePage extends StatelessWidget {
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 4), // Adds space between the texts
+                        const SizedBox(
+                          height: 4,
+                        ), // Adds space between the texts
                         const Text(
                           "Choose what suits your lifestyle",
                           style: TextStyle(color: Colors.white, fontSize: 12),
@@ -91,7 +117,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 12),
-                  Icon(Icons.chevron_right, color: Colors.white,)
+                  Icon(Icons.chevron_right, color: Colors.white),
                 ],
               ),
             ),
@@ -100,38 +126,55 @@ class ProfilePage extends StatelessWidget {
             const Text("General", style: TextStyle(color: Colors.grey)),
             ListTile(
               leading: const Icon(Icons.person_outline_rounded),
-              title: const Text("Personal Info", style: TextStyle(fontWeight: FontWeight.w500)),
+              title: const Text(
+                "Personal Info",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 Navigator.push(
                   context,
                   // Replace MaterialPageRoute with PageRouteBuilder
                   PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => const PersonalInfoPage(),
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      // Define the start and end positions for the slide
-                      const begin = Offset(-1.0, 0.0); // Start from the bottom
-                      const end = Offset.zero; // End at the original position (no offset)
-                      const curve = Curves.easeInOut;
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const PersonalInfoPage(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                          // Define the start and end positions for the slide
+                          const begin = Offset(
+                            -1.0,
+                            0.0,
+                          ); // Start from the bottom
+                          const end = Offset
+                              .zero; // End at the original position (no offset)
+                          const curve = Curves.easeInOut;
 
-                      // Create the animation tween
-                      final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                      final offsetAnimation = animation.drive(tween);
+                          // Create the animation tween
+                          final tween = Tween(
+                            begin: begin,
+                            end: end,
+                          ).chain(CurveTween(curve: curve));
+                          final offsetAnimation = animation.drive(tween);
 
-                      // Return the SlideTransition widget
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      );
-                    },
-                    transitionDuration: const Duration(milliseconds: 400), // Optional: Adjust speed
+                          // Return the SlideTransition widget
+                          return SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          );
+                        },
+                    transitionDuration: const Duration(
+                      milliseconds: 400,
+                    ), // Optional: Adjust speed
                   ),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.language),
-              title: const Text("Language", style: TextStyle(fontWeight: FontWeight.w500)),
+              title: const Text(
+                "Language",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
               trailing: const Text("English (Philippines)"),
             ),
 
@@ -139,23 +182,41 @@ class ProfilePage extends StatelessWidget {
             const Text("About", style: TextStyle(color: Colors.grey)),
             ListTile(
               leading: const Icon(Icons.help_outline),
-              title: const Text("Help Center", style: TextStyle(fontWeight: FontWeight.w500)),
+              title: const Text(
+                "Help Center",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
               trailing: const Icon(Icons.chevron_right),
             ),
             ListTile(
               leading: const Icon(Icons.lock_outline_rounded),
-              title: const Text("Privacy Policy", style: TextStyle(fontWeight: FontWeight.w500)),
+              title: const Text(
+                "Privacy Policy",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
               trailing: const Icon(Icons.chevron_right),
             ),
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: const Text("About AgapAI", style: TextStyle(fontWeight: FontWeight.w500)),
+              title: const Text(
+                "About AgapAI",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
               trailing: const Icon(Icons.chevron_right),
             ),
             ListTile(
-              leading: const Icon(Icons.logout_rounded, color: Color(0xFFA42A25)),
-              title: const Text("Logout",
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500)),
+              leading: const Icon(
+                Icons.logout_rounded,
+                color: Color(0xFFA42A25),
+              ),
+              title: const Text(
+                "Logout",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onTap: () => logOut(context),
             ),
           ],
         ),

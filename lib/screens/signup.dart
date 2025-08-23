@@ -41,7 +41,7 @@ class _SignupPageState extends State<SignupPage> {
       // Show error to user
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result),
+          content: Text(result, style: const TextStyle(color: Colors.white)),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -73,7 +73,10 @@ class _SignupPageState extends State<SignupPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result ?? 'Signup successful!'),
+          content: Text(
+            result ?? 'Signup successful!',
+            style: const TextStyle(color: Colors.white),
+          ),
           backgroundColor: result == null ? Colors.green : Colors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
