@@ -48,7 +48,7 @@ class _AgapAIAppState extends State<AgapAIApp> {
 
   Future<void> checkFirstTime() async {
     final prefs = await SharedPreferences.getInstance();
-    final firstTime = prefs.getBool('isFirstTime') ?? true;
+    final firstTime =  true;
 
     // mark as opened after first launch
     if (firstTime) {

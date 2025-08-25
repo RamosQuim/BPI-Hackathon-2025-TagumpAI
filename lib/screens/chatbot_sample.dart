@@ -80,7 +80,7 @@ class _ChatAppState extends State<ChatApp> {
         final Map<String, dynamic> storyData = json.decode(storyResponse.body);
 
         if (storyData.containsKey('error')) {
-          _showErrorScenario('An error occurred: ${storyData['error']}');
+          _showErrorScenario('Something went wrong.');
           return;
         }
 
@@ -108,11 +108,11 @@ class _ChatAppState extends State<ChatApp> {
       } else {
         if (mounted) {
           _showErrorScenario(
-              "Server returned an error: ${storyResponse.statusCode}");
+              "Something went wrong.");
         }
       }
     } catch (e) {
-      if (mounted) _showErrorScenario("An error occurred: $e");
+      if (mounted) _showErrorScenario("Something went wrong.");
     }
   }
 
