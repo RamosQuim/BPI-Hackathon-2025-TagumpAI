@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       // Show error to user
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result),
+          content: Text(result, style: const TextStyle(color: Colors.white)),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
         // Show snackbar on error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result),
+            content: Text(result, style: const TextStyle(color: Colors.white)),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
